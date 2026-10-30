@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Xứ Sở Thần Tiên – game phiêu lưu silhouette lấy cảm hứng từ Limbo, bối cảnh Thất Sơn, An Giang."><style>body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>Xứ Sở Thần Tiên</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,400;0,600;1,400&family=Be+Vietnam+Pro:wght@400;500&display=swap">
+<style>
+/* One dark game screen. Tokens: night ink, fog, pale moonlight, lamp gold. */
+:root{--ink:#050607;--fog:#9aa3a8;--pale:#e7e3d6;--lamp:#f0c879;--display:"Noto Serif Display",Georgia,serif;--body:"Be Vietnam Pro",system-ui,sans-serif;color-scheme:dark}
+html,body{height:100%;background:#050607;color:var(--pale);overflow:hidden;font-family:var(--body)}
+canvas#g{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));transition:opacity .9s;z-index:10}
+.ov.hide{opacity:0;pointer-events:none}
+#title{background:radial-gradient(ellipse at 50% 42%,rgba(5,6,7,.55),rgba(5,6,7,0) 62%);justify-content:flex-start;padding-top:max(7vh,28px)}
+#title .mark{width:clamp(64px,8vw,96px);filter:invert(.92) sepia(.3);opacity:.9;animation:rise 2.4s ease both}
+.ov h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6.6vw,76px);letter-spacing:.14em;margin:0;line-height:1.1;text-wrap:balance;text-shadow:0 0 40px rgba(240,200,121,.16);animation:rise 2.4s ease .2s both}
+#title .orn{width:min(520px,78vw);filter:invert(.8) sepia(1) saturate(1.6) hue-rotate(-12deg);opacity:.75;animation:rise 2.4s ease .5s both}
+.ov .insp{font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--fog);animation:rise 2.4s ease .8s both}
+.ov .ded{font-family:var(--display);font-style:italic;font-size:clamp(14px,1.6vw,17px);line-height:1.7;color:#d6d0be;max-width:46ch;margin:4px 0 6px;animation:rise 3.2s ease 1.4s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ov p{margin:0;color:var(--fog);max-width:52ch;font-size:14px;line-height:1.7}
+.ov .sub{font-family:var(--display);letter-spacing:.3em;font-size:12px;text-transform:uppercase;color:var(--fog)}
+.ov button,.ov a.btn{font:inherit;font-size:14px;letter-spacing:.12em;color:var(--pale);background:rgba(5,6,7,.25);border:1px solid rgba(231,227,214,.45);padding:10px 26px;border-radius:2px;cursor:pointer;text-decoration:none}
+.ov button:hover,.ov button:focus-visible,.ov a.btn:hover,.ov a.btn:focus-visible{border-color:var(--lamp);color:var(--lamp);outline:none}
+.ov .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:rise 2s ease 2s both}
+.ov .col{display:flex;flex-direction:column;gap:10px;min-width:min(280px,80vw)}
+.ov .small button,.ov .small a.btn{font-size:12px;padding:7px 16px}
+.ov .b-donate{border-color:rgba(240,200,121,.6)!important;color:var(--lamp)!important}
+.keys{font-size:12px;color:var(--fog);letter-spacing:.04em;animation:rise 2s ease 2.2s both}
+.keys b{font-weight:500;color:var(--pale)}
+#pause,#lost,#end,#donate{background:rgba(4,5,6,.8);z-index:20}
+#donate{z-index:30}
+#pauseBtn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));z-index:15;width:38px;height:38px;border-radius:50%;border:1px solid rgba(231,227,214,.25);background:rgba(4,5,6,.35);color:rgba(231,227,214,.7);font-size:11px;cursor:pointer}
+#touch{position:fixed;inset:auto 0 0 0;display:none;justify-content:space-between;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));pointer-events:none;z-index:5}
+#touch .grp{display:flex;gap:14px;pointer-events:auto}
+#touch button{width:64px;height:64px;border-radius:50%;border:1px solid rgba(231,227,214,.25);background:rgba(231,227,214,.06);color:rgba(231,227,214,.6);font-size:20px;touch-action:none;user-select:none;-webkit-user-select:none}
+#touch button.on{background:rgba(231,227,214,.18)}
+.ov.split{flex-direction:row;flex-wrap:wrap;gap:clamp(24px,6vw,80px);overflow:auto}
+.ov.split .menu{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:420px;min-width:0}
+/* support card: night ink, moonlit parchment QR, thin lamp-gold rules */
+.qcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(300px,86vw);padding:20px 20px 16px;background:linear-gradient(180deg,rgba(14,16,19,.92),rgba(6,7,9,.92));border:1px solid rgba(240,200,121,.28);box-shadow:0 0 0 4px rgba(6,7,9,.6),0 0 0 5px rgba(240,200,121,.12),0 20px 60px rgba(0,0,0,.6)}
+.qcard.compact{width:min(260px,80vw);padding:16px 16px 12px;gap:8px}
+.qcard::before,.qcard::after{content:"";position:absolute;width:14px;height:14px;border:1px solid rgba(240,200,121,.55)}
+.qcard::before{top:6px;left:6px;border-right:0;border-bottom:0}.qcard::after{bottom:6px;right:6px;border-left:0;border-top:0}
+.qorn{width:62%;filter:invert(.8) sepia(1) saturate(1.6) hue-rotate(-12deg);opacity:.7}
+.qh{margin:0;font-family:var(--display);font-weight:400;font-size:19px;letter-spacing:.08em;color:var(--pale)}
+.qcard.compact .qh{font-size:16px}
+.qsub{margin:0;font-size:12.5px;line-height:1.55;color:var(--fog);text-align:center;max-width:30ch}
+.qframe{position:relative;width:100%;padding:8px;background:#ece6d6;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(18,19,22,.15),0 0 34px rgba(240,200,121,.12)}
+.qframe::after{content:"";position:absolute;inset:-5px;border:1px solid rgba(240,200,121,.35);pointer-events:none}
+.qframe canvas,.qframe img{display:block;width:100%;height:auto;image-rendering:pixelated}
+.qamts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.ov .qamts button{padding:6px 0;font-size:12px;letter-spacing:.03em;border-radius:999px;border-color:rgba(231,227,214,.28)}
+.ov .qamts button.on{border-color:var(--lamp);color:var(--lamp);background:rgba(240,200,121,.08)}
+.qcustom{display:flex;gap:8px;align-items:center;width:100%;font-size:12px;color:var(--fog)}
+.qcustom input{flex:1;min-width:0;font:inherit;font-size:13px;background:transparent;color:var(--pale);border:0;border-bottom:1px solid rgba(231,227,214,.3);padding:5px 2px}
+.qcustom input:focus{outline:none;border-bottom-color:var(--lamp)}
+.qcard.compact .qcustom{display:none}
+.qbank{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;padding-top:8px;border-top:1px solid rgba(231,227,214,.12)}
+.qbn{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--fog)}
+.qho{font-family:var(--display);font-size:16px;color:var(--pale);letter-spacing:.04em}
+.qac{display:flex;gap:8px;align-items:center;font-variant-numeric:tabular-nums;font-size:13px;color:var(--pale);letter-spacing:.06em}
+.ov .qcopy{font-size:10.5px;padding:3px 9px;letter-spacing:.06em;border-radius:999px;border-color:rgba(240,200,121,.45);color:var(--lamp)}
+.qnote{margin:0;font-size:11.5px;color:var(--fog);text-align:center;font-variant-numeric:tabular-nums;min-height:1.4em}
+.dwrap{display:flex;flex-direction:column;align-items:center;gap:14px;max-height:100%;overflow:auto;padding:6px}
+@media (max-height:820px){.qsub{display:none}.qcard:not(.compact) .qframe{width:min(100%,210px)}.qcard{gap:8px;padding-top:14px}.dwrap{gap:10px}}
+@media (max-height:640px){.qcard .qframe{width:min(100%,170px)}.qorn{display:none}}
+@media (max-width:700px){.ov.split{flex-direction:column;justify-content:flex-start;padding-top:max(24px,env(safe-area-inset-top,0px))}}
+@media (max-height:560px){#title .ded{display:none}#title{padding-top:16px}}
+@media (prefers-reduced-motion:reduce){.ov,.ov *{transition:none;animation:none!important}}
+</style>
+
+<canvas id="g"></canvas>
+<div id="touch"><div class="grp"><button id="tl" aria-label="Trái">◀</button><button id="tr" aria-label="Phải">▶</button></div><div class="grp"><button id="ta" aria-label="Nắm kéo">✋</button><button id="tj" aria-label="Nhảy">▲</button></div></div>
+
+<div class="ov" id="title">
+  <img class="mark" src="a/logo_mark.webp" alt="">
+  <h1>XỨ SỞ THẦN TIÊN</h1>
+  <img class="orn" src="a/orn_long.webp" alt="">
+  <span class="insp">Lấy cảm hứng từ Limbo</span>
+  <p class="ded">Dành tặng những tâm hồn yêu gia đình tha thiết, dẫu mang muôn vàn thương tổn vẫn kiên cường sống và dịu dàng yêu lấy cuộc đời.</p>
+  <p id="loadmsg">Đang tải…</p>
+  <div class="row"><button id="start" type="button" hidden>Bắt đầu</button></div>
+  <div class="row small"><button type="button" class="b-donate">Ủng hộ</button><a class="btn b-vlg" href="https://vinhlamgame.vercel.app/#/" target="_blank" rel="noopener">Vinh làm game</a></div>
+  <span class="keys"><b>← →</b> đi · <b>Space</b> nhảy · <b>Shift</b> giữ để nắm, kéo · <b>Esc</b> tạm dừng</span>
+</div>
+<div class="ov hide split" id="end"><div class="menu">
+  <span class="sub">Hết bản thử</span>
+  <h1 style="font-size:clamp(28px,5vw,52px)">Đồng thốt nốt</h1>
+  <p>Bờ đất nứt, nước tràn xuống rạch. Phía trước là rừng tràm Trà Sư.</p>
+  <div class="col"><button id="again" type="button">Chơi lại</button><a class="btn b-vlg" href="https://vinhlamgame.vercel.app/#/" target="_blank" rel="noopener">Vinh làm game</a></div>
+</div><aside class="qrside" aria-label="Ủng hộ"><div class="qrbox" data-compact="1"></div></aside></div>
+<div class="ov hide split" id="pause"><div class="menu">
+  <span class="sub">Tạm dừng</span>
+  <div class="col"><button type="button" id="resume">Tiếp tục</button><button type="button" id="retryCP">Chơi lại từ chỗ vừa qua</button><button type="button" id="retryAll">Chơi lại từ đầu</button><a class="btn b-vlg" href="https://vinhlamgame.vercel.app/#/" target="_blank" rel="noopener">Vinh làm game</a></div>
+</div><aside class="qrside" aria-label="Ủng hộ"><div class="qrbox" data-compact="1"></div></aside></div>
+<div class="ov hide split" id="lost"><div class="menu">
+  <span class="sub">Cậu bé ngã thêm lần nữa</span>
+  <p>Cứ thử lại, em gái vẫn đang chờ ở phía trước.</p>
+  <div class="col"><button type="button" id="lostRetry">Chơi lại</button><a class="btn b-vlg" href="https://vinhlamgame.vercel.app/#/" target="_blank" rel="noopener">Vinh làm game</a></div>
+</div><aside class="qrside" aria-label="Ủng hộ"><div class="qrbox" data-compact="1"></div></aside></div>
+<div class="ov hide" id="donate">
+  <div class="dwrap" role="dialog" aria-label="Ủng hộ Vinh làm game"><div class="qrbox"></div><button type="button" id="dn-close" class="qclose">Quay lại</button></div>
+</div>
+<button type="button" id="pauseBtn" aria-label="Tạm dừng" hidden>❚❚</button>
+
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+<script src="js/encounter.js"></script>
+<script src="js/vendor/qrcode.js"></script>
+<script src="js/support.js"></script>
+<script src="https://vinhlamgame.vercel.app/vlg.js" data-game="xu-so-than-tien" defer></script>
+</body></html>

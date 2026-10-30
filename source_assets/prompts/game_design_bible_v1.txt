@@ -1,0 +1,444 @@
+BẢY NÚI — README / GAME DESIGN BIBLE v1.0
+
+> Tài liệu nguồn để đưa cho Claude (hoặc AI coding assistant) tạo prompt triển khai game. **Không tự ý thêm cơ chế vượt giới hạn.**
+
+0. Vai trò và cách sử dụng
+
+Đây là đặc tả thiết kế game, không phải mã nguồn. Khi nhận tài liệu, Claude cần:
+
+1. Giữ nguyên cốt truyện, cấu trúc 6 vùng và 24 nhịp trải nghiệm.
+2. Chuyển từng thử thách thành prompt triển khai có: mục tiêu, bố cục blockout, trigger, collider, trạng thái, checkpoint, điều kiện thành công/thất bại, tín hiệu thị giác/âm thanh, danh sách asset và tiêu chí nghiệm thu.
+3. Đề xuất kiến trúc thực thi tối giản cho web 2D; chia việc thành các mốc có thể chơi được. Không tự triển khai hay thay đổi phạm vi khi chưa được duyệt.
+4. Ghi rõ giả định và điểm cần kiểm thử, đặc biệt timing, physics, độ khó, thời lượng.
+5. Giữ README và asset manifest đồng bộ sau mỗi phiên bản.
+
+1. Tổng quan
+
+• Tên: BẢY NÚI (tạm).
+• Thể loại: 2D cinematic puzzle platformer, góc nhìn ngang, silhouette đen trắng, Gothic hữu cơ thanh mảnh; cảm hứng không khí từ Limbo/Inside nhưng không sao chép.
+• Bối cảnh: Thất Sơn, An Giang: đồng thốt nốt → rừng tràm Trà Sư → Núi Két → lòng núi → rừng Núi Cấm → đỉnh núi.
+• Thời lượng mục tiêu: 30 phút, một hành trình liền mạch, không chia màn, không cửa dịch chuyển, không camera cắt cảnh.
+• Thời gian: Hoàng hôn → chạng vạng → đêm → đêm sâu → trước bình minh → bình minh.
+• Nhân vật: Cậu bé khoảng 8 tuổi, đội nón lá, đi tìm em gái chạy theo một đốm sáng rồi mất tích.
+• Kết: Hai anh em đoàn tụ trên đỉnh lúc bình minh. Năm sinh vật khổng lồ xuất hiện trong cảnh quan, hóa ra là những vị canh giữ chứ không phải kẻ săn đuổi.
+• Kể chuyện: Không lời thoại, không chữ hướng dẫn, chỉ dùng hành vi, môi trường, nhịp camera, âm thanh, ánh sáng.
+• Diễn giải văn hóa: Năm sinh vật là sáng tạo hư cấu lấy cảm hứng từ địa hình và không khí dân gian Thất Sơn, không khẳng định là truyền thuyết có thật.
+
+Trụ cột trải nghiệm
+
+1. Người chơi nhỏ bé trước thế giới cổ xưa và các sinh vật khổng lồ.
+2. Nguy hiểm đến từ địa hình và nhịp sống của sinh vật, không phải hệ thống chiến đấu.
+3. Mỗi vùng giới thiệu một nhóm cơ chế mới, sau đó phối hợp với cơ chế cũ.
+4. Thử-và-sai công bằng: luôn có tín hiệu cảnh báo; checkpoint gần.
+5. Cao trào ở rừng Núi Cấm, sau đó hạ độ khó hoàn toàn ở đỉnh.
+
+2. Giới hạn kỹ thuật bắt buộc
+
+Điều khiển: trái/phải, nhảy, một phím hành động theo ngữ cảnh (nắm, kéo, đẩy, kéo cần gạt). Không thêm phím cúi, chạy, bơi, tấn công, đổi đồ. Chạy trong truy đuổi dùng tốc độ di chuyển ngữ cảnh hoặc tốc độ nhân vật có sẵn, không yêu cầu phím mới.
+
+Cơ chế được phép:
+
+• Đi, nhảy, leo vách/dây, nắm/đu dây.
+• Đẩy/kéo thùng, xe, khúc gỗ; khúc gỗ nổi; vật rơi; bánh xe/bánh răng; bệ xoay; cần gạt.
+• Mực nước dâng/hạ; dòng nước dịch chuyển vật.
+• Ẩn sau vật cản khỏi tầm nhìn; sương/ánh sáng thay đổi khả năng quan sát.
+• Bẫy theo thời gian; chạy trốn theo nhịp; chuyển động dọc, rơi, leo.
+• Sinh vật từ lớp nền tiến gần lớp chơi theo kịch bản.
+
+Không được thêm: chiến đấu, vũ khí, kho đồ, hội thoại, lựa chọn lời thoại, HUD chỉ dẫn, câu đố chữ, bơi tự do, đường đi 3D/2.5D, chuyển cảnh bằng cửa, cut camera, AI săn đuổi phức tạp.
+
+Thông số blockout ban đầu (đều phải playtest): nhân vật cao 64 WU, collider rộng 22 WU; tốc độ ngang 180 WU/s; nhảy cao tối đa 105 WU, xa ~165 WU; tương tác trong 36 WU. Khoảng nhảy an toàn cần có dư địa. Camera bám ngang, bám dọc khi cần, chuyển động mượt, không teleport.
+
+Checkpoint: vô hình, mỗi 30–60 giây tiến trình; chết fade 0,3–0,5 giây rồi hồi sinh gần nhất. Khôi phục vị trí vật, cần gạt, nước, trạng thái sinh vật, bẫy; không tạo softlock. Nếu checkpoint nằm trên vật chuyển động, dùng vị trí hồi sinh an toàn đã xác định.
+
+Sinh vật: sprite 2D phân đoạn, chuyển động theo timeline/spline/trigger; không yêu cầu AI tìm đường. Đối tượng nền không tự nhiên va chạm với nhân vật trừ vùng nguy hiểm được định nghĩa rõ.
+
+3. Quy tắc dựng từng thử thách
+
+Mỗi thử thách phải có: mã ID; thời lượng mục tiêu; cơ chế; bố cục; thao tác người chơi; dấu hiệu trước nguy hiểm; cách chết; checkpoint; điều kiện hoàn thành; asset và các trigger cần thiết. Mỗi vùng kết nối tự nhiên sang vùng kế tiếp, không cắt camera. Thời gian đã gồm nhịp chuyển vùng, không cộng thêm.
+
+────────
+
+4. VÙNG 01 — ĐỒNG THỐT NỐT | 00:00–04:00 | Hoàng hôn
+
+Không khí và sinh vật
+
+Đồng thốt nốt, bờ ruộng, rạch nước, chòi lá, dãy Thất Sơn xa. Em gái đuổi theo đốm sáng và biến mất sau thân cây. Người Thốt Nốt giống cụm cây cho tới khi nhấc chân rễ khỏi mặt đất; thân thanh mảnh, cành như vòm Gothic. Bước chân gây rung đất, rụng quả, đôi khi đặt xuống gần người chơi. Không chủ động săn cậu bé.
+
+Thử thách tuần tự
+
+01 — Bờ ruộng đầu tiên | 45s
+
+• Cơ chế: đi, nhảy. Ba rãnh nước rộng 65/95/125 WU; rãnh đầu an toàn, hai rãnh sau sâu/nguy hiểm.
+• Làm: theo dấu em gái, nhảy qua các rãnh.
+• Chết: rơi rãnh sâu.
+• Checkpoint: CP01-A đầu đoạn; CP01-B sau rãnh thứ hai.
+
+02 — Xe bò mắc lầy | 60s
+
+• Cơ chế: đẩy/kéo, nhảy.
+• Làm: đẩy xe bò tới chân vách cao 125 WU, leo lên xe để nhảy qua.
+• Chết: không; puzzle an toàn.
+• Checkpoint: CP01-C sau vách.
+
+03 — Mưa quả thốt nốt | 70s
+
+• Cơ chế: vật rơi theo nhịp, ẩn dưới mái lá.
+• Làm: quan sát ba cụm quả rung báo trước 1,2s; tiến theo khoảng trống, trú dưới chòi.
+• Chết: quả lớn rơi trúng.
+• Checkpoint: CP01-D trước cụm đầu; CP01-E dưới mái chòi.
+
+04 — Bước chân vị canh giữ | 65s
+
+• Cơ chế: đẩy thân cây làm cầu, bước chân theo nhịp.
+• Làm: đẩy cây qua rãnh; vượt khi chân sinh vật chưa đặt xuống. Vùng chân 90 WU, chu kỳ 6s, cảnh báo rung đất ~2s.
+• Chết: bị giẫm hoặc rơi xuống nước sâu.
+• Checkpoint: CP01-F trước cầu.
+
+Chuyển vùng
+
+Bước chân làm nứt bờ đất, nước tràn và cuốn khúc gỗ đang đỡ nhân vật xuống rạch. Camera trượt theo dòng nước, thân thốt nốt thưa dần, tràm xuất hiện. Người chơi giữ quyền điều khiển.
+
+Asset
+
+• Nền xa: dãy Thất Sơn, mặt trời thấp, cụm thốt nốt, đàn cò.
+• Nền giữa: ruộng, bờ đất, kênh, chòi, cụm cây rung.
+• Tiền cảnh: cỏ lác, lá thốt nốt, bụi đất, cành khô.
+• Vật thể rời: xe bò, thân cây đổ, quả 3 kích thước, mái lá.
+• Sinh vật: 2 chân rễ, thân phân đoạn, tán lá, tay cành, bóng toàn thân xa.
+
+────────
+
+5. VÙNG 02 — RỪNG TRÀM TRÀ SƯ | 04:00–09:00 | Chạng vạng
+
+Không khí và sinh vật
+
+Tràm trắng, bèo phủ kênh, sương mỏng, ánh sáng cuối ngày. Sấu Chúa chỉ lộ mắt, sống lưng như dãy vòm và phần đuôi. Nó tuần tra dưới nước; di chuyển làm bèo tách, nước đổi hướng và gỗ nổi dịch chuyển. Nguy hiểm đến từ dòng nước và vùng quan sát.
+
+Thử thách tuần tự
+
+05 — Con đường trên bèo | 65s
+
+• Cơ chế: khúc gỗ nổi, nhảy.
+• Làm: qua khoảng nước 450 WU bằng ba khúc gỗ trôi; khoảng nhảy 110–140 WU, gỗ dừng khi va rễ.
+• Chết: rơi nước sâu.
+• Checkpoint: CP02-A trên bờ; gỗ reset khi chết.
+
+06 — Cống rừng tràm | 70s
+
+• Cơ chế: cần gạt, nước dâng, vật nổi.
+• Làm: kéo cần, nước tăng 95 WU trong 8s, khúc gỗ nâng thành bậc; vượt cống trước khi cần reset sau 15s.
+• Chết: kẹt dưới dầm khi nước dâng ở vị trí nguy hiểm.
+• Checkpoint: CP02-B trước cần.
+
+07 — Hơi thở Sấu Chúa | 80s
+
+• Cơ chế: tầm nhìn, ẩn nấp, nhịp.
+• Làm: đứng khuất sau thân tràm hoặc địa hình thấp; Sấu Chúa quét 4s rồi lặn 5s, vượt lúc nó lặn. Không dùng phím cúi.
+• Chết: bị phát hiện tại nước nông, sóng đuôi đánh vào rễ nhọn.
+• Checkpoint: CP02-C trước vùng quan sát; CP02-D sau cụm tràm thứ hai.
+
+08 — Sống lưng thành cầu | 85s
+
+• Cơ chế: nhảy trên phần cơ thể, quan sát nhịp.
+• Làm: đợi Sấu Chúa nổi yên, nhảy qua ba phiến sống lưng; trước khi lặn, lưng rung báo 1,5s.
+• Chết: rơi nước hoặc bị sóng đánh vào rễ.
+• Checkpoint: CP02-E trước kênh; CP02-F bờ đối diện.
+
+Chuyển vùng
+
+Sấu Chúa lặn, mực nước hạ; khúc gỗ trôi vào suối đá. Nhân vật nhảy lên bờ, camera tiếp tục qua sườn đá hướng Núi Két.
+
+Asset
+
+• Nền xa: rừng tràm, tán, chim, sương.
+• Nền giữa: thân tràm, bèo, kênh, cống, rễ lớn.
+• Tiền cảnh: bèo, rễ, cành thấp, gợn nước.
+• Vật rời: ba gỗ, cần gạt, cửa cống, bệ nổi.
+• Sinh vật: mắt, 5–7 đốt sống lưng, đầu, đuôi, sóng.
+
+────────
+
+6. VÙNG 03 — NÚI KÉT | 09:00–14:00 | Đêm
+
+Không khí và sinh vật
+
+Vách đá, rễ cây, bậc đá cổ, gió qua khe như tiếng sáo. Chim Két Đá là một phần vách núi; vòm đá là mỏ, khe nứt là mắt, các khối đá là cánh. Khi thức dậy, đá rơi và các bệ chuyển động. Không chủ động tấn công.
+
+Thử thách tuần tự
+
+09 — Bậc đá trên lưng núi | 65s
+
+• Cơ chế: leo gờ/vách.
+• Làm: vượt vách 320 WU bằng ba gờ, mỗi khoảng dọc tối đa 85 WU. Hành động để bám khi cạnh vách leo được.
+• Chết: rơi khe sâu cuối đoạn.
+• Checkpoint: CP03-A chân vách; CP03-B bệ giữa.
+
+10 — Cối đá bỏ quên | 75s
+
+• Cơ chế: đẩy bánh xe, đối trọng, bệ chuyển động.
+• Làm: đẩy bánh đá đường kính 110 WU vào hõm; bệ dây/ròng rọc hạ đủ để nhảy lên.
+• Chết: bánh lăn đè khi đứng phía trước.
+• Checkpoint: CP03-C trước bánh.
+
+11 — Vách đá thức dậy | 80s
+
+• Cơ chế: leo, đá rơi theo chu kỳ.
+• Làm: leo qua ba cụm đá rung, nghỉ ở hai hốc an toàn; mỗi đợt rơi cách ~5s, bụi và tiếng nứt báo trước.
+• Chết: đá rơi trúng hoặc rơi khỏi vách.
+• Checkpoint: CP03-D dưới vách; CP03-E hốc giữa.
+
+12 — Cánh chim hóa lối đi | 80s
+
+• Cơ chế: cần gạt, bánh răng, bệ xoay, nhảy.
+• Làm: kéo cần, bệ xoay 60 độ trong 7s; lên khi bệ ngang, nhảy sang gờ cao khi bệ nghiêng; cánh Chim Két ở nền giữa hé khe sáng gợi hướng.
+• Chết: rơi vực.
+• Checkpoint: CP03-F trước cần; CP03-G gờ cao.
+
+Chuyển vùng
+
+Cánh đá khép làm nền nứt; nhân vật trượt vào khe, camera theo xuống, đáp sườn đá dốc vào lòng núi. Không fade/cắt cảnh.
+
+Asset
+
+• Nền xa: núi chồng lớp, trăng, thung lũng.
+• Nền giữa: vách hình két, cánh, khe nứt, kiến trúc cổ.
+• Tiền cảnh: gờ, rễ, bụi đá, mỏm nhọn.
+• Vật rời: bánh đá, bánh răng, bệ xoay, cần, đá rơi.
+• Sinh vật: mỏ, mắt, mí, mảng cánh, lông đá.
+
+────────
+
+7. VÙNG 04 — LÒNG NÚI | 14:00–19:00 | Đêm sâu
+
+Không khí và sinh vật
+
+Giếng đá thẳng đứng, mạch nước ngầm, cột đá, ánh sáng rọi từ trên. Rắn Thần cuộn quanh cột đá; thân nhiều đoạn dài hơn khung hình, vảy như hoa văn vòm Gothic. Nó di chuyển theo nhịp mạch nước, đẩy bệ, rung dây và đôi khi ép sát vách.
+
+Thử thách tuần tự
+
+13 — Giếng đá đầu tiên | 65s
+
+• Cơ chế: nắm và đu dây.
+• Làm: giếng rộng 360 WU, sâu 500 WU; dây dài 220 WU. Nhảy, giữ hành động để nắm, trái/phải lấy đà, nhảy buông sang gờ.
+• Chết: rơi đáy giếng.
+• Checkpoint: CP04-A mép giếng; CP04-B bờ bên kia.
+
+14 — Cột sống của núi | 75s
+
+• Cơ chế: leo dọc, bệ xuất hiện theo nhịp.
+• Làm: leo trục cao 650 WU; thân Rắn trượt qua chu kỳ 9s, đẩy bệ ra trong 4s; nhảy lên và leo tiếp.
+• Chết: rơi xuống đá nhọn.
+• Checkpoint: CP04-C chân trục; CP04-D bệ nghỉ giữa trục.
+
+15 — Mạch nước ngầm | 75s
+
+• Cơ chế: cần gạt, nước dâng/hạ, bè nổi.
+• Làm: mở nước nâng bè 120 WU; sau 12s nước rút, phải nhảy khỏi bè lên gờ.
+• Chết: kẹt trần đá thấp hoặc rơi vực khi bè hạ.
+• Checkpoint: CP04-E trước cần; CP04-F gờ trên.
+
+16 — Vòng cuộn Rắn Thần | 85s
+
+• Cơ chế: đu dây, leo, bệ theo nhịp, ánh sáng.
+• Làm: đu dây 1 tới gờ, đợi thân rắn đi qua, nắm dây 2 để lên miệng giếng. Chu kỳ 10s, cửa sổ vượt ~5s; khe sáng soi vùng an toàn.
+• Chết: rơi giếng hoặc bị ép vào vách tại bệ khép.
+• Checkpoint: CP04-G trước dây 1; CP04-H gờ giữa.
+
+Chuyển vùng
+
+Thân Rắn nâng lên mở khe đá; nhân vật leo rễ lên mặt đất, camera nâng theo. Tiếng nước nhỏ giọt chuyển thành tiếng rừng đêm; bóng cọp trắng thoáng qua nền xa.
+
+Asset
+
+• Nền xa: giếng sâu, cột đá, khe sáng, mạch nước.
+• Nền giữa: vòm đá, thân rắn phân đoạn, hồ ngầm, thạch nhũ.
+• Tiền cảnh: rễ, đá ướt, nhũ, vách tối.
+• Vật rời: dây leo, cần, bè, bệ trượt, đá nhọn.
+• Sinh vật: 6–8 đoạn thân, đầu xa, vảy, đuôi, bóng.
+
+────────
+
+8. VÙNG 05 — RỪNG NÚI CẤM | 19:00–25:00 | Trước bình minh
+
+Không khí và sinh vật
+
+Rừng cổ thụ, sương dày, âm thanh thưa dần. Ông Ba Mươi là cọp trắng khổng lồ tạo từ sương, sọc như ren, thân lúc hiện lúc tan. Có vẻ săn đuổi, nhưng thực chất dồn cậu bé khỏi vùng rừng sắp sạt lở lên đường đỉnh núi. Không tiết lộ điều này bằng chữ hay lời thoại.
+
+Thử thách tuần tự
+
+17 — Rừng không có lối | 75s
+
+• Cơ chế: sương che tầm nhìn, ẩn nấp.
+• Làm: ba khoảng rừng sương chu kỳ 8s, khi dày chỉ thấy rõ ~160 WU; ẩn sau cây hoặc di chuyển lúc sương phủ.
+• Chết: bị cọp phát hiện ở đoạn trống, bóng trắng lao qua.
+• Checkpoint: CP05-A đầu rừng; CP05-B sau cụm cây thứ hai.
+
+18 — Tiếng chân sau lưng | 80s
+
+• Cơ chế: truy đuổi có kịch bản, nhảy, vật rơi.
+• Làm: chạy qua ~650 WU, nhảy hai rễ lớn, tránh thân cây đổ; cọp giữ khoảng cách theo timeline, chỉ bắt khi chậm quá ngưỡng.
+• Chết: bị bắt, vấp rồi bị bắt, cây đè.
+• Checkpoint: CP05-C trước truy đuổi; CP05-D sau thân cây.
+
+19 — Chiếc cầu trong sương | 90s
+
+• Cơ chế: đẩy gỗ, sương, tầm nhìn.
+• Làm: đẩy thân gỗ vào khe cầu gãy trong 4s sương dày của chu kỳ 7s; nhảy qua.
+• Chết: bị phát hiện ngoài vùng che hoặc rơi khe.
+• Checkpoint: CP05-E trước thân gỗ; CP05-F sau cầu.
+
+20 — Con đường cuối cùng | 115s
+
+• Cơ chế: chạy trốn, nhảy, leo, đu, đá rơi, sương.
+• Làm: đoạn ~1.100 WU: nhảy rễ → bệ đá sụp → đu qua khe → leo vách ngắn. Sự kiện kích hoạt theo vị trí và có cảnh báo; cọp phóng qua nền sau, tạo sương che khi nhân vật lên vách cuối.
+• Chết: rơi vực, đá rơi, bị bắt khi chậm.
+• Checkpoint: CP05-G trước chuỗi; CP05-H sau đu dây (~55s). Không bắt lặp toàn bộ 115s.
+
+Chuyển vùng
+
+Cậu bé vượt vách; sương trắng phủ khung hình nhưng camera không cắt. Sương tan dần lộ triền núi và bình minh. Cọp đứng mép rừng, cúi đầu rồi tan vào sương.
+
+Asset
+
+• Nền xa: rừng Núi Cấm, núi, sương, khe sáng.
+• Nền giữa: cổ thụ, cầu gãy, cọp, vách sạt.
+• Tiền cảnh: dây, bụi, sương, rễ.
+• Vật rời: gỗ, dây đu, bệ sụp, đá rơi.
+• Sinh vật: đầu, mắt, chân trước, thân, đuôi, ba lớp sương.
+
+────────
+
+9. VÙNG 06 — ĐỈNH NÚI | 25:00–30:00 | Bình minh
+
+Không khí và sinh vật
+
+Đường núi mở rộng, biển mây dưới chân, bình minh làm cảnh từ đen sang xám bạc. Không còn thử thách chết. Đốm sáng bên em gái ở mỏm đá. Năm sinh vật xuất hiện rất xa, bình thản như các phần của núi, rừng, nước.
+
+Nhịp trải nghiệm tuần tự
+
+21 — Con đường không còn sợ hãi | 60s
+
+• Cơ chế: đi, nhảy nhẹ, không nguy hiểm.
+• Làm: đi lên triền núi, gờ và gỗ giờ chỉ là cảnh quan.
+• Chết: không.
+• Checkpoint: CP06-A đầu triền.
+
+22 — Những bóng hình trên mây | 75s
+
+• Cơ chế: quan sát khi di chuyển, trigger theo vị trí.
+• Làm: lần lượt thấy chân Người Thốt Nốt, sống lưng Sấu Chúa, cánh Chim Két ở xa.
+• Chết: không.
+• Checkpoint: CP06-B giữa đường.
+
+23 — Em gái dưới ánh bình minh | 75s
+
+• Cơ chế: đi, phím hành động.
+• Làm: tới cây nhỏ nơi em gái ngồi, cô bé quay lại; nhấn hành động để nắm tay. Không giới hạn thời gian chờ.
+• Chết: không.
+• Checkpoint: CP06-C trước điểm gặp.
+
+24 — Bảy Núi thức giấc | 90s
+
+• Cơ chế: quan sát, sự kiện tự động, camera mở rộng mượt.
+• Làm: hai anh em đến mỏm đá; năm vị canh giữ hiện ở các lớp xa, cùng hướng về mặt trời. Đốm sáng bay vào nắng. Hai anh em ngồi cạnh nhau, nón lá đặt xuống; giữ khung ~8s rồi logo kết thúc như lớp UI.
+• Chết: không.
+• Checkpoint: CP06-D mỏm đá.
+
+Chuyển/kết
+
+Không có vùng kế tiếp. Camera vẫn trong cùng thế giới, không cắt sang cinematic khác.
+
+Asset
+
+• Nền xa: bảy lớp núi, biển mây, chân trời, mặt trời.
+• Nền giữa: sườn, cây nhỏ, mỏm đá, bóng năm vị canh giữ.
+• Tiền cảnh: cỏ núi, đá, cành, lá bay.
+• Vật rời: nón đặt xuống, đốm sáng, lá.
+• Sinh vật: silhouette xa của cả năm, chuyển động nhẹ.
+• Nhân vật: em gái idle/quay đầu/đứng/nắm tay; cậu bé bỏ nón/ngồi.
+
+────────
+
+10. Bảng cơ chế và lần xuất hiện đầu
+
+|Cơ chế                    |Lần đầu|Tái sử dụng             |
+|--------------------------|-------|------------------------|
+|Đi/nhảy                   |V1–01  |Toàn game               |
+|Đẩy/kéo vật               |V1–02  |V3, V5                  |
+|Vật rơi theo thời gian    |V1–03  |V3, V5                  |
+|Nhịp chuyển động nguy hiểm|V1–04  |V2–V5                   |
+|Gỗ nổi                    |V2–05  |V4                      |
+|Cần gạt                   |V2–06  |V3, V4                  |
+|Nước dâng/hạ              |V2–06  |V4                      |
+|Ẩn khỏi tầm nhìn          |V2–07  |V5                      |
+|Leo vách/gờ               |V3–09  |V4, V5                  |
+|Bánh xe/bánh răng         |V3–10  |V3                      |
+|Bệ xoay/chuyển động       |V3–12  |V4                      |
+|Đu dây                    |V4–13  |V5                      |
+|Di chuyển theo trục dọc   |V3–09  |V4, V5                  |
+|Sương che tầm nhìn        |V5–17  |V5, V6 (không nguy hiểm)|
+|Truy đuổi có kịch bản     |V5–18  |V5                      |
+|Hành động cảm xúc         |V6–23  |Kết thúc                |
+
+11. Thời lượng và đường cong khó
+
+|Vùng            |Khoảng phút|Tổng       |Độ khó mục tiêu|
+|----------------|-----------|----------:|--------------:|
+|Đồng thốt nốt   |0–4        |4 phút     |1–3/10         |
+|Rừng tràm Trà Sư|4–9        |5 phút     |3–5/10         |
+|Núi Két         |9–14       |5 phút     |4–6/10         |
+|Lòng núi        |14–19      |5 phút     |5–7/10         |
+|Rừng Núi Cấm    |19–25      |6 phút     |7–10/10        |
+|Đỉnh núi        |25–30      |5 phút     |0/10           |
+|**Tổng**        |**0–30**   |**30 phút**|               |
+
+Tổng 24 nhịp (20 thử thách có nguy hiểm hoặc puzzle + 4 nhịp kết thúc an toàn). Thời lượng là mục tiêu thiết kế, chưa kiểm chứng. Người mới có thể mất 35–45 phút do chết và thử lại. Đo bằng playtest và hiệu chỉnh.
+
+12. Kiến trúc màn chơi và QA bắt buộc
+
+• Một world side-scrolling liên tục, camera không cắt; streaming/chunk asset ngầm ở hành lang chuyển vùng.
+• Các vùng có trigger tiến độ; mỗi thử thách là một encounter có state machine tối giản: inactive → introduced → active → completed, và failed → checkpoint_restore.
+• Hazard báo trước rõ bằng rung, bụi, tiếng nứt, thay đổi sương hoặc chuyển động; không có cái chết bất ngờ không thể dự đoán.
+• Sinh vật nền dùng sprite phân đoạn, tween/timeline/spline; collider nguy hiểm chỉ bật ở vùng và thời điểm định nghĩa.
+• Tương tác phím hành động ưu tiên vật gần nhất có thể thao tác; nắm dây/leo không xung đột với đẩy/kéo.
+• Puzzle có đường hồi phục khi thất bại, vật không mắc kẹt, không có checkpoint lưu trạng thái không thể giải.
+• Vùng truy đuổi chia checkpoint tối đa 60s; chạy đủ tốc độ mặc định để thắng nếu người chơi thao tác đúng.
+• Vùng 6 không có hazard chết, không ép người chơi bấm nhanh.
+• Thiết kế responsive cho desktop/mobile: ánh xạ các thao tác sang điều khiển cảm ứng tương đương, không phát sinh cơ chế mới.
+
+Kiểm thử nghiệm thu
+
+1. Có thể đi xuyên suốt sáu vùng trong cùng một phiên, camera không cắt.
+2. Không cần thêm nút ngoài trái/phải, nhảy, hành động.
+3. Tất cả 24 encounter có trigger vào/ra, reset và checkpoint hoạt động.
+4. Mỗi lần chết hồi sinh tại checkpoint hợp lệ, puzzle không softlock.
+5. Có tín hiệu cảnh báo trước hazard; thời gian phản ứng đủ theo tốc độ nhân vật.
+6. Sinh vật khổng lồ hiếm khi lộ toàn thân, không yêu cầu AI phức tạp.
+7. Mỗi vùng có đặc trưng cảnh quan Thất Sơn và palette silhouette thống nhất.
+8. Kết thúc không có nguy hiểm và không lời thoại/chữ hướng dẫn.
+9. Đo thời lượng thực tế qua playtest, báo cáo chênh lệch so với mục tiêu 30 phút.
+
+13. Asset manifest khởi tạo (nhóm)
+
+Tạo manifest dạng CSV/JSON với trường: asset_id, region, layer, type, description, dimensions, frames, status, version, source, notes. ID gợi ý: BN_V01_BG_FAR_01, BN_V02_CREATURE_SPINE_01, BN_V05_PROP_LOG_01. Mỗi vùng có năm nhóm: BG_FAR, BG_MID, FG, PROP, CREATURE; riêng vùng 6 thêm CHARACTER. Các danh sách asset chi tiết đã ghi trong từng vùng.
+
+14. Prompt mẫu để gửi Claude
+
+Bạn là Lead Level Designer kiêm Technical Game Design Planner cho game web 2D BẢY NÚI. Hãy đọc toàn bộ README đính kèm và coi đây là source of truth. Không được tự thêm cơ chế, nút điều khiển, cắt camera, chuyển màn, chiến đấu, inventory, lời thoại hay HUD hướng dẫn.
+
+Nhiệm vụ đầu tiên: chuyển README thành một bộ prompt triển khai cho đội lập trình, KHÔNG viết code ở bước này.
+
+Đầu ra cần có:
+1. Ma trận 24 encounter, mỗi encounter gồm ID, mục tiêu, layout blockout theo WU, trigger, collider, state machine, animation timeline, âm thanh/tín hiệu, chết, checkpoint, reset, điều kiện hoàn thành và acceptance tests.
+2. Sơ đồ nối sáu vùng thành một world 2D liền mạch, gồm vị trí các hành lang streaming và camera behavior.
+3. Danh sách asset có ID, layer, kích thước gợi ý, số frame/tách lớp, thứ tự ưu tiên; xuất asset_manifest.csv mẫu.
+4. Backlog MVP theo sprint, ưu tiên thử nghiệm gỗ nổi Trà Sư, leo giếng Rắn Thần, truy đuổi Ông Ba Mươi trước khi sản xuất toàn bộ asset.
+5. Các giả định kỹ thuật, rủi ro và câu hỏi cần tôi duyệt. Phân biệt rõ số liệu từ README và đề xuất mới.
+
+Trình bày bằng tiếng Việt, đủ chi tiết để coder bắt tay dựng. Bắt đầu với architecture + encounter 01–04 và chờ duyệt trước khi làm tiếp.
+
+15. Quản lý phiên bản
+
+• v1.0 — Đặc tả gameplay, 6 vùng, 24 nhịp, checkpoint, asset nhóm, thời lượng mục tiêu.
+• Mọi thay đổi thiết kế sau này phải cập nhật README, asset manifest và changelog, không tự ghi đè các nguyên tắc đã khóa.

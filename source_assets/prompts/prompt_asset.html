@@ -1,0 +1,454 @@
+<title>Prompt Asset Xứ Sở Thần Tiên</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@500;700&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: một cột đọc, thanh vùng dính trên đầu, mỗi asset là một thẻ prompt có nút sao chép. Bảng màu lấy từ thế giới silhouette: giấy trắng, mực đen, sương xám, một đốm đèn vàng. */
+:root{
+  --paper:#f6f6f3; --ink:#111211; --fog:#6c6f6a; --mist:#dfe0dc; --card:#ffffff; --lamp:#b8862b;
+  --display:"Noto Serif Display", Georgia, serif;
+  --body:"Be Vietnam Pro", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0d0e0d; --ink:#e9eae6; --fog:#8d918b; --mist:#252724; --card:#151715; --lamp:#e0b45a; color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0d0e0d; --ink:#e9eae6; --fog:#8d918b; --mist:#252724; --card:#151715; --lamp:#e0b45a; color-scheme:dark}
+html{background:var(--paper)}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:860px;margin:0 auto}
+canvas#ridge{display:block;width:100%;height:110px;margin-top:24px}
+header h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:20px 0 8px;text-wrap:balance;letter-spacing:.01em}
+header p{color:var(--fog);max-width:62ch;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--mist);margin:28px 0 0;padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav a{flex:none;font-size:13px;font-weight:500;color:var(--ink);text-decoration:none;padding:5px 11px;border:1px solid var(--mist);border-radius:999px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{border-color:var(--ink);outline:none}
+nav a .n{color:var(--fog);font-family:var(--mono);font-size:11px;margin-left:4px}
+section{margin-top:44px;scroll-margin-top:70px}
+section > h2{font-family:var(--display);font-weight:500;font-size:28px;line-height:1.15;margin:0 0 4px;text-wrap:balance}
+.meta{font-size:13px;color:var(--fog);margin:0 0 14px}
+.rule-list{margin:10px 0 0;padding-left:20px}
+.rule-list li{margin:4px 0}
+.list{display:flex;flex-direction:column;gap:12px}
+h3.group{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin:26px 0 4px;display:flex;gap:8px;align-items:baseline}
+h3.group .n{font-family:var(--mono);color:var(--fog);font-weight:400;letter-spacing:0}
+.gnote{font-size:13px;color:var(--fog);margin:0 0 10px;max-width:65ch}
+.card{background:var(--card);border:1px solid var(--mist);border-radius:6px;padding:14px 16px;min-width:0}
+.card.done{opacity:.55}
+.head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.id{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.02em}
+.name{font-weight:600;flex:1 1 200px;min-width:0}
+.ratio{font-family:var(--mono);font-size:11px;color:var(--fog);border:1px solid var(--mist);border-radius:3px;padding:1px 6px}
+.note{font-size:13px;color:var(--fog);margin:6px 0 0}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;background:var(--paper);border-radius:4px;padding:10px 12px;margin:10px 0 0;max-height:220px;overflow:auto}
+.actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+button{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:1px solid var(--ink);border-radius:4px;padding:5px 12px;cursor:pointer}
+button:hover{background:var(--ink);color:var(--paper)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+button.ok{border-color:var(--lamp);color:var(--lamp);background:transparent}
+label.chk{font-size:13px;color:var(--fog);display:flex;gap:6px;align-items:center;cursor:pointer;margin-left:auto}
+input[type=checkbox]{accent-color:var(--lamp);width:16px;height:16px}
+.master{border-color:var(--ink);border-width:1.5px}
+.progress{font-family:var(--mono);font-size:12px;color:var(--fog);font-variant-numeric:tabular-nums}
+.steps{counter-reset:s;list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+.steps li{counter-increment:s;padding-left:30px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:11px;font-weight:600;display:grid;place-items:center}
+code{font-family:var(--mono);font-size:12.5px;background:var(--mist);padding:0 4px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <canvas id="ridge" aria-hidden="true"></canvas>
+  <header>
+    <h1>Xứ Sở Thần Tiên · Prompt asset</h1>
+    <p>Bộ prompt để vẽ toàn bộ asset bằng ChatGPT, bám theo Game Design Bible v1.0. Mỗi vùng mở một cuộc chat riêng, dán khối phong cách trước, rồi tạo từng asset theo thứ tự. Đánh dấu ô bên phải khi đã có ảnh đạt.</p>
+    <p>Mỗi vùng có nền xa đổi dần theo tiến trình, nền giữa riêng cho từng nhịp chơi, bộ cảnh rời để code tự dàn cảnh, một cảnh điểm nhấn và một đoạn chuyển vùng, nên không đoạn nào lặp lại y hệt.</p>
+    <p class="progress" id="progress"></p>
+  </header>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const STYLE = `For this whole conversation you are the concept artist for "XỨ SỞ THẦN TIÊN" (The Fairy Realm), a 2D side-scrolling silhouette game. Every image you make must follow this fixed style, with no exceptions:
+
+- Pure flat black (#000000) shapes on a pure white (#FFFFFF) background. Only these two colors. No grey, no gradient, no texture, no outline, no glow, no cast shadow, no text, no signature, no frame.
+- Gothic organic aesthetic: elongated slender proportions, fine thorns, filigree and lace-like edges, cathedral-rib and pointed-arch structures. Delicate, elegant, ancient and quietly eerie. Never gory, never cartoonish.
+- Edges are crisp and detailed (thin branches, grass blades, hanging roots), but every shape is a solid black mass with no inner lines.
+- Strict side view, flat orthographic camera, no perspective tilt.
+- Setting: Thất Sơn (Seven Mountains), An Giang, Vietnam. Sugar palms, rice-field banks, cajuput swamps of Trà Sư, granite mountains, caves, ancient forests of Núi Cấm. Mystical, fairy-tale folklore mood.
+- Scale reference: the hero is a small 8-year-old boy in a conical hat. Giant creatures must feel overwhelming next to him.
+- Giant creatures (bosses) share one dreamlike, half-real half-illusion look: their silhouettes are solid at the core but dissolve at the edges into drifting particles, mist wisps and fine threads; negative-space cutouts inside their bodies reveal tiny stars, branches or landscape like a double exposure; some limbs are only implied by thin lines. Imaginative, surreal, like a vision seen through fog.
+
+- Background color: pure white (#FFFFFF) by default. When a prompt says CHROMA GREEN, use a perfectly flat pure green (#00FF00) background instead, with no shadow, no gradient and no green tint on the character.
+
+Reply "OK" and wait. I will request one asset per message, each with an ID. Output one PNG per request, high resolution.`;
+
+const TAIL = `\n\nKeep the fixed style: pure flat black silhouette on pure white, no grey, no gradient, no outline, no texture, no text.`;
+
+const LAYER = {
+  far:`DISTANT BACKGROUND LAYER. Simple, large, calm shapes with low detail. Silhouettes fill only the bottom 45% of the image; everything above is empty pure white (the sky is added in the game engine). The bottom edge is solid black across the full width.`,
+  mid:`MIDDLE BACKGROUND LAYER. Medium detail. A continuous black ground mass runs along the full bottom 20%. Objects rise up to 75% of the height with clear white gaps between them. The far left and right edges show only ground, no object cut in half, so the strip can be repeated side by side.`,
+  fg:`FOREGROUND FRAMING LAYER. Very large close-up shapes, as if right in front of the camera. Shapes only along the bottom edge and the far left and right edges; the central 60% of the image stays completely empty white.`,
+  shaft:`VERTICAL BACKGROUND LAYER (portrait). A tall vertical composition seen from the side, the viewer is inside the space. Rock walls on the left and right edges, open white space in the center column for gameplay. Top and bottom edges should continue naturally so several images can be stacked vertically.`
+};
+const bg = (layer, scene) => `Wide panoramic landscape image.\n${LAYER[layer]}\nScene: ${scene}${TAIL}`;
+const prop = (s) => `Single isolated game prop, centered, strict side view, full shape visible with at least 15% white margin on every side, no ground line under it.\nSubject: ${s}${TAIL}`;
+const parts = (s) => `Cutout rigging sheet for 2D skeletal animation. Keep each part a clean solid shape (the game adds the dissolving mist and particles in code). Draw each listed part separately, spread out on the canvas with clear white gaps; no part touches or overlaps another; all parts at the same scale; each joint end is rounded so parts can overlap when assembled.\nParts: ${s}${TAIL}`;
+const scene = (beat, s) => `Wide panoramic landscape image.\nMIDDLE LAYER SET PIECE for gameplay beat ${beat}. A unique, specific composition, not a repeating pattern. A continuous black ground mass along the bottom 20% that follows the terrain described. The far left and right edges end on low flat ground so this image connects to neighboring images.\nScene: ${s}${TAIL}`;
+const kit = (s) => `Scenery kit sheet for a 2D game. Draw 8 to 10 separate isolated elements of the same family, each standing on its own small flat ground base, spread across the canvas in rows with clear white gaps, none touching or overlapping, all at the same scale. Give each element a clearly different height, shape and character so they never look repeated when placed side by side.\nElements: ${s}${TAIL}`;
+const landmark = (s) => `Wide panoramic landscape image. LANDMARK VIEW: one memorable composition the player sees only once. Dramatic scale, strong readable silhouette, generous empty white space above. A continuous black ground mass along the bottom.\nScene: ${s}${TAIL}`;
+const trans = (a, b) => `Wide panoramic landscape image. TRANSITION MIDDLE LAYER: the scenery changes gradually from left to right in one continuous landscape, with no visible border. Continuous black ground along the bottom 20%.\nLeft third: ${a}\nRight third: ${b}\nCenter: a natural blend of both.${TAIL}`;
+const BOY = `the same small barefoot Vietnamese boy, about 8 years old, slim, slightly large head, messy short hair under a Vietnamese conical hat (nón lá) with a thin chin strap, loose short-sleeved shirt and loose knee-length shorts. Pure flat black silhouette; the ONLY other color is one tiny round white dot for the visible eye. Arms and legs always clearly separated from the body by green negative space so every limb reads in silhouette.`;
+const SIS = `the same small Vietnamese girl, about 6 years old, short bob hair with a small tuft, simple loose knee-length dress, barefoot. Pure flat black silhouette; the ONLY other color is one tiny round white dot for the visible eye. Arms and legs always clearly separated from the body by green negative space.`;
+const sheet = (who, cols, rows, frames) => `SPRITE SHEET for 2D frame animation. CHROMA GREEN background: perfectly flat pure green #00FF00 over the whole image.\nLayout: an invisible grid of ${cols} columns x ${rows} rows = ${cols*rows} equal cells, read left to right, top to bottom. Exactly one full-body pose per cell, centered horizontally in its cell, never touching or crossing the cell borders. No grid lines, no numbers, no text.\nConsistency rules: identical character, identical proportions and identical scale in every cell; the soles of the feet sit on the same invisible baseline at 90% of each cell's height (except airborne frames); facing right; strict side view; smooth evenly spaced motion between frames so they play as one fluid loop or action.\nCharacter: ${who}\nFrames: ${frames}\nKeep the fixed style: pure flat black silhouette, no grey, no outline, no texture, no glow.`;
+const full = (s) => `Reference image. Colossal gothic creature, strict side view, full body visible, centered, towering scale. A tiny silhouette of a boy in a conical hat stands at its feet for scale.\nDreamlike half-real, half-illusion style: the core of the body is solid black, but its outer edges dissolve into drifting black particles, mist wisps and fine threads; white negative-space cutouts inside the body show tiny stars, branches or distant landscape like a double exposure; some thin parts are only suggested by a few lines. Surreal and imaginative, quietly majestic, not scary-gory.\nCreature: ${s}${TAIL}`;
+
+const REGIONS = [
+ {key:"style", title:"Khối phong cách", meta:"Dán đầu tiên ở mọi cuộc chat mới", style:true},
+ {key:"menu", title:"Trang chào", meta:"Màn hình khi mở game · chữ do code viết để đúng dấu tiếng Việt: tên game, dòng LẤY CẢM HỨNG TỪ LIMBO và lời đề tặng", items:[
+  ["XS_MENU_KEYART_01","Ảnh chính tràng ngang (tham khảo, ảnh chia sẻ)","3:2",`Key art for the title screen of the game, one complete composition. Night after dusk in Thất Sơn: a small boy in a conical hat stands alone on a narrow rice-field bank in the lower left third, seen from the side, holding a small broken glass jar, looking toward a single tiny floating light far ahead. Behind him a field of tall sugar palms; among them, barely distinguishable from the trees, the colossal Palm Walker stands still with its palm-trunk legs and crown of fan leaves, its edges dissolving into drifting particles. The Seven Mountains layered far behind. The upper 45% of the image is calm and almost empty (space for the title), the center stays open around the floating light. Quiet, tender, melancholic, majestic. The floating light is a small round white gap.${TAIL}`],
+  ["XS_MENU_KEYART_02","Ảnh chính tràng dọc (điện thoại)","2:3",`Portrait version of the title key art: the same scene recomposed vertically. The small boy in a conical hat stands on a rice-field bank near the bottom center, seen from the side, holding a broken glass jar, looking up and to the right at a single tiny floating light. Tall sugar palms on both sides frame the image; one of them is secretly the colossal Palm Walker, its edges dissolving into particles. The upper 50% stays calm and almost empty for the title. The floating light is a small round white gap.${TAIL}`],
+  ["XS_MENU_BG_FAR_01","Lớp xa · Bảy Núi và cánh đồng","3:2",bg("far","the Seven Mountains of Thất Sơn layered in three soft ridges, a flat field in front of them with a few lone sugar palms, leaving the whole upper part empty for the night sky.")],
+  ["XS_MENU_BG_MID_01","Lớp giữa · rặng thốt nốt và Người Thốt Nốt ẩn mình","3:2",`Wide panoramic landscape image, MIDDLE LAYER for a slowly moving title screen. Groups of tall sugar palms on the left and right thirds, the center third kept open and low. Hidden among the palms on the right, the colossal Palm Walker stands motionless, its two palm-trunk legs and crown of fan leaves looking almost like trees, its outline dissolving into drifting particles and mist wisps. Continuous black ground along the bottom 15%.${TAIL}`],
+  ["XS_MENU_CHR_BOY_01","Cậu bé đứng nhìn đốm sáng (4 khung, thở nhẹ)","3:2",sheet(BOY,2,2,"standing still on a rice-field bank, facing right, holding a small broken glass jar loosely in one hand at his side, head slightly raised looking far ahead; a very subtle breathing loop: shoulders rise and fall, the hat tilts a tiny bit, the chin strap sways.")],
+  ["XS_MENU_FG_01","Tiền cảnh · cỏ và lá thốt nốt viền khung","3:2",bg("fg","tall grass blades and rice stalks along the bottom edge, one large drooping sugar palm frond entering from the top-right corner, thin reeds at the far left edge.")],
+  ["XS_MENU_UI_ORNAMENT_01","Hoa văn Gothic cho chữ (đường kẻ, góc, dấu ngăn)","3:2",prop("a set of delicate ornaments for a title screen, as separate pieces with gaps: (1) a long thin horizontal divider line with a tiny gothic pointed-arch motif in the middle and tapering filigree ends, (2) a short version of the same divider, (3) four matching corner flourishes made of thin palm-leaf and thorn filigree, (4) a small diamond-shaped separator dot. Very thin lines, elegant, minimal. The game will tint them pale gold.")],
+  ["XS_MENU_UI_LOGO_MARK_01","Biểu tượng nhỏ đặt trên tên game","1:1",prop("a small emblem to sit above a game title: a conical hat (nón lá) seen from the side, with seven tiny mountain peaks rising from its brim like a crown, and a single small round white gap above the middle peak as a floating light. Simple, iconic, readable at small size.")]
+ ]},
+ {key:"music", title:"Âm nhạc", meta:"Prompt cho công cụ tạo nhạc AI (Suno, Udio…) · bật chế độ Instrumental, dùng gói có quyền thương mại", items:[
+  ["XS_MUSIC_MENU_01","Nhạc chào · trang welcome","~2:30 · lặp",`Instrumental only, no vocals, no humming. A tender, whimsical and melancholic lullaby waltz in 3/4 time, around 84 BPM, in D minor drifting into F major. Lead melody on music box and celesta, gentle fingerpicked ukulele, soft pizzicato strings, a warm low cello line, a light glockenspiel answer. A simple, memorable 8-bar theme that returns with small variations, like a children's song remembered in a dream. Mood: childlike wonder, quiet heartbreak and stubborn hope, slightly uneasy like a shadow puppet show at night. Soft tape warmth, distant night crickets underneath. Intimate, sparse, never loud. Ends so it loops seamlessly into the beginning.`],
+  ["XS_MUSIC_JOURNEY_01","Nhạc đi cảnh · nền khi chơi","~4:00 · lặp",`Instrumental only, no vocals. Slow, atmospheric ambient score for exploring a misty night landscape, around 66 BPM, no drums. Long evolving drones, deep bowed double bass, airy pads, sparse Vietnamese đàn bầu (monochord) slides and a breathy bamboo flute echoing far away, now and then a few lonely music-box notes quoting a gentle lullaby waltz. Field textures: wind through sugar palms, water dripping, insects. Mood: lonely, mysterious, beautiful, a small child walking through an ancient fairy realm. Low intensity, lots of space, no strong melody, sits quietly under gameplay. Seamless loop, no fade out.`],
+  ["XS_MUSIC_REST_01","Nhạc dừng · tạm dừng, hết chặng, chờ","~1:30 · lặp",`Instrumental only, no vocals. A very calm, slow music box solo playing a gentle lullaby waltz theme at half speed, around 60 BPM, with soft reverb, then joined by quiet felt piano and a faint string pad. Mood: a pause to breathe, warm, bittersweet, relieved, like resting by a dim oil lamp after a long walk. Minimal, delicate, soft dynamics throughout. Loops seamlessly.`],
+  ["XS_MUSIC_DANGER_01","(Tuỳ chọn) Nhạc căng thẳng · khi sinh vật khổng lồ xuất hiện","~1:00 · lặp",`Instrumental only, no vocals. Tense, eerie underscore for the moment a colossal gentle creature walks nearby, around 50 BPM. Deep sub-bass pulses like distant footsteps, low bowed cello clusters, scraped strings, a reversed music-box phrase, a slowly rising high string tone. Mood: awe and fear mixed, overwhelming scale, but not horror. Sparse, heavy, slow. Loops seamlessly.`]
+ ]},
+ {key:"v0", title:"Mở đầu · Nhà bên đồng", meta:"Chạng vạng · Em gái bắt đom đóm, cậu bé khiêng thùng gỗ vào nhà, tiếng thét, chiếc hũ vỡ", items:[
+  ["XS_V00_BG_FAR_01","Nền xa · đồng trống, Thất Sơn xa","3:2",bg("far","a wide open rice field at dusk, the low ridge of the Seven Mountains far away, a few lone sugar palms, a calm empty sky area.")],
+  ["XS_V00_BG_MID_01","Nền giữa · sân nhà và bờ ruộng","3:2",scene("mở đầu",`a small Mekong home yard at the edge of the fields: a woodpile, a hammock between two trees, a clothesline with hanging clothes, a low bamboo fence, a water jar, then the rice-field bank opening to the right.`)],
+  ["XS_V00_BG_MID_02","Nền giữa · bãi cỏ cao nơi em biến mất","3:2",scene("mở đầu",`a dense patch of very tall wild grass and reeds at the edge of the field, taller than a man, with a narrow dark opening in the middle as if someone just ran through; sugar palms rising behind it.`)],
+  ["XS_V00_PROP_HOUSE_01","Nhà sàn (cửa mở, bậc thang)","3:2",prop("a small Mekong wooden stilt house with a thatched palm-leaf roof, an open front door, a short wooden staircase of four steps, a small porch, a hanging oil lantern by the door. Draw the open doorway as a clear white opening. Full house visible, ground line only under the stilts.")],
+  ["XS_V00_PROP_CRATE_01","Thùng gỗ (3 trạng thái)","3:2",prop("a rustic wooden crate with plank slats and rope handles, drawn three times side by side with gaps: standing upright, tipped on its edge, and dropped on the ground with a few vegetables spilling out.")],
+  ["XS_V00_PROP_JAR_01","Hũ đom đóm (nguyên, đổ, vỡ)","3:2",`Single isolated game props, CHROMA GREEN background (perfectly flat #00FF00). A small glass jar with a cloth cover tied by string, drawn three times side by side with gaps: (1) intact standing, (2) tipped over on its side with the cloth cover loose, (3) broken into several shards on the ground. Black silhouette with thin white highlight lines showing the glass edges.${TAIL}`],
+  ["XS_V00_KIT_01","Bộ cảnh rời · cỏ cao, lau sậy","3:2",kit("tall wild grass clumps and reeds of different heights and densities, some bent by wind, some with feathery seed heads, one very dense clump with a narrow gap a child could slip through.")],
+  ["XS_V00_FG_01","Tiền cảnh · hiên nhà, chõi lá gần","3:2",bg("fg","the edge of a thatched roof and a hanging lantern at the top-left corner, a wooden post with a hanging conical hat at the left edge, tall grass blades along the bottom.")]
+ ]},
+ {key:"v1", title:"Vùng 1 · Đồng thốt nốt", meta:"00:00–04:00 · Hoàng hôn · Người Thốt Nốt", items:[
+  ["XS_V01_BG_FAR_01","Dãy Thất Sơn xa, cụm thốt nốt, đàn cò","3:2",bg("far","the low rolling ridge of the Seven Mountains of An Giang on the horizon, a few isolated clusters of tall sugar palm trees with round fan-shaped crowns, a small flock of storks flying low.")],
+  ["XS_V01_BG_MID_01","Ruộng, bờ đất, kênh, chòi, cụm thốt nốt","3:2",bg("mid","Mekong rice-field banks and a narrow canal, a lone thatched stilt hut, groups of tall slender sugar palms of varying heights, some leaning, dry grass on the banks.")],
+  ["XS_V01_FG_01","Cỏ lác, lá thốt nốt, cành khô","3:2",bg("fg","tall sedge grass blades and reeds, a large drooping sugar palm frond entering from the top-left corner, dry twisted branches at the right edge.")],
+  ["XS_V01_PROP_CART_01","Xe bò (thân xe, không có bò)","1:1",prop("an old Mekong wooden ox cart without the ox: a long flat bed, curved side rails, a long forward shaft. Draw the cart body and its single large spoked wheel as two separate pieces side by side, so the wheel can rotate in the game.")],
+  ["XS_V01_PROP_LOG_01","Thân thốt nốt đổ (làm cầu)","3:2",prop("a long fallen sugar palm trunk lying horizontally, ringed bark texture shown only through the outline bumps, broken jagged end on the right, a few root strands on the left.")],
+  ["XS_V01_PROP_FRUIT_01","Quả thốt nốt 3 cỡ","1:1",prop("sugar palm fruits in three sizes arranged in a row with gaps: a single small round fruit, a medium cluster of three, a large heavy cluster of seven with its stem. Also one cracked fruit split in two.")],
+  ["XS_V01_PROP_FRUIT_02","Quả rụng nằm lại trên đất","3:2",prop("sugar palm fruits after falling, as separate pieces in rows with gaps: a single fruit resting on the ground, a fruit cracked open, a fruit split into two halves, a small pile of three fruits, a fallen cluster still on its stem, a heavy cluster half buried with clods of earth thrown up around it.")],
+  ["XS_V01_FX_LEAVES_01","Lá thốt nốt rơi báo trước","3:2",prop("falling sugar palm debris for animation, as separate pieces with gaps: six small dry leaf fragments in different rotations, two broken frond tips, a few seeds and bits of bark.")],
+  ["XS_V01_PROP_HUT_01","Chòi lá trú quả rơi","1:1",prop("a small open field shelter on four thin bamboo legs with a steep thatched palm-leaf roof, ragged leaf edges hanging down. Open underneath so a child can stand inside.")],
+  ["XS_V01_CREATURE_FULL_01","Người Thốt Nốt · toàn thân tham khảo","2:3",full("the Palm Walker, an impossibly tall thin being whose two legs look exactly like sugar palm trunks with root-feet; its torso is a narrow gothic cathedral ribcage; its head is a crown of fan-shaped palm leaves; long branch-like arms hang down. It looks like a cluster of palm trees until it moves.")],
+  ["XS_V01_CREATURE_PARTS_01","Người Thốt Nốt · bộ phận ráp xương","3:2",parts("of the Palm Walker: (1) left leg trunk, (2) right leg trunk, (3) root-foot flat on the ground, (4) root-foot lifted with roots dangling and soil falling, (5) narrow cathedral-rib torso, (6) crown of fan palm leaves, (7) long branch arm.")],
+  ["XS_V01_CREATURE_STEP_01","Người Thốt Nốt · cận bàn chân bước","3:2",`Extreme close-up of only the lower part of one palm-trunk leg of the Palm Walker stepping down onto a rice-field bank, root-foot spreading, clods of earth and small fruits flying off. The top of the leg is cropped by the frame. A tiny boy in a conical hat stands nearby for scale.${TAIL}`]
+ ]},
+ {key:"v2", title:"Vùng 2 · Rừng tràm Trà Sư", meta:"04:00–09:00 · Chạng vạng · Sấu Chúa", items:[
+  ["XS_V02_BG_FAR_01","Rừng tràm xa, tán, chim","3:2",bg("far","a distant flooded cajuput (melaleuca) forest, a dense line of thin vertical trunks with soft rounded canopies, a few herons perched on top.")],
+  ["XS_V02_BG_MID_01","Thân tràm đứng trong nước, bèo, rễ lớn","3:2",bg("mid","tall thin cajuput trunks standing in still water, peeling bark silhouette, large arching aerial roots, a flat waterline covered with a mat of water hyacinth and duckweed. The ground mass is the water surface with plants.")],
+  ["XS_V02_FG_01","Rễ treo, cành thấp, bèo","3:2",bg("fg","hanging cajuput roots and thin branches dangling from the top edge, large water hyacinth leaves and flowers along the bottom edge.")],
+  ["XS_V02_PROP_LOGS_01","3 khúc gỗ nổi","3:2",prop("three floating cajuput logs of different lengths (short, medium, long) stacked vertically with gaps, each with a few broken branch stubs and a little duckweed on top.")],
+  ["XS_V02_PROP_GATE_01","Cống gỗ và cần gạt","1:1",prop("an old wooden sluice gate: a tall frame of two posts and a top beam, a separate sliding gate panel drawn beside it, and a separate wooden lever with a counterweight stone on its pivot post. Three separate pieces with gaps.")],
+  ["XS_V02_PROP_RAFT_01","Bệ nổi","3:2",prop("a small floating bamboo platform raft made of lashed bamboo poles, ropes trailing into the water.")],
+  ["XS_V02_CREATURE_FULL_01","Sấu Chúa · toàn thân tham khảo","3:2",full("the Crocodile Sovereign, an enormous ancient crocodile shown half submerged at a waterline. Only its back is above water: a long row of tall gothic pointed arches rising from its spine like a sunken cathedral. Below the waterline its body is huge and long. Eyes are small ornate ridges.")],
+  ["XS_V02_CREATURE_PARTS_01","Sấu Chúa · 7 phiến sống lưng","3:2",parts("seven separate spine plates of the Crocodile Sovereign, each a gothic pointed arch with lace-like serrated edges and a flat top area a child could stand on, sizes from small to large. Plus one tail tip with ridged scutes.")],
+  ["XS_V02_CREATURE_HEAD_01","Sấu Chúa · mắt và đầu nhô khỏi nước","3:2",`Close-up at the waterline: the eye ridge and snout of the Crocodile Sovereign just above a mat of water hyacinth, one large ornate eye socket with a small round white gap as the pupil, water hyacinth parting around it. Draw a second version beside it with only the eye ridge visible.${TAIL}`],
+  ["XS_V02_FX_WAVE_01","Sóng và bèo tách","3:2",prop("water splash and wave shapes for animation, drawn as solid black flat shapes in a row: a small ripple, a medium splash, a large tail-slap wave curling over, and a mat of duckweed splitting in two.")]
+ ]},
+ {key:"v3", title:"Vùng 3 · Núi Két", meta:"09:00–14:00 · Đêm · Chim Két Đá", items:[
+  ["XS_V03_BG_FAR_01","Núi chồng lớp, thung lũng","3:2",bg("far","overlapping granite mountain ridges of the Seven Mountains, a deep valley between them, a few lone trees on the peaks.")],
+  ["XS_V03_BG_MID_01","Vách núi hình chim két","3:2",bg("mid","a massive granite cliff whose shape secretly forms a parrot: a curved stone arch is its beak, a dark crack is its closed eye, layered rock slabs are folded wings. Ancient carved stone steps and fragments of ruined gothic stonework cling to the cliff.")],
+  ["XS_V03_FG_01","Gờ đá, rễ, mỏm nhọn","3:2",bg("fg","jagged granite spurs and sharp rock points along the bottom, twisted tree roots gripping a boulder on the left, a thin dead branch on the right.")],
+  ["XS_V03_PROP_LEDGES_01","Bộ gờ đá leo","3:2",prop("a set of five separate rock ledges for climbing, different widths, flat tops, rough undersides, one with roots hanging down.")],
+  ["XS_V03_PROP_WHEEL_01","Bánh cối đá, ròng rọc, bệ dây","1:1",prop("an ancient round stone millstone wheel with a square hole in the center and carved gothic rim pattern; beside it a separate wooden pulley with rope, and a separate hanging wooden platform on ropes. Three separate pieces.")],
+  ["XS_V03_PROP_GEARS_01","Bánh răng đá, bệ xoay, cần gạt","1:1",prop("ancient stone and bronze mechanisms as separate pieces: two gear wheels of different sizes with gothic spoke patterns, a long flat rotating stone platform on a central pivot, and a stone lever with a carved handle.")],
+  ["XS_V03_PROP_ROCKS_01","Đá rơi 4 cỡ","1:1",prop("four separate falling rocks from small to large, angular granite chunks, plus a small cluster of debris and pebbles.")],
+  ["XS_V03_CREATURE_FULL_01","Chim Két Đá · toàn thân tham khảo","2:3",full("the Stone Parrot, a colossal parrot formed from a granite cliff face: a heavy curved beak, a long tail of stone slabs, wings made of stone cathedral ribs with lace-like gaps between them, feathers like stacked carved stone tiles. It looks like part of the mountain.")],
+  ["XS_V03_CREATURE_PARTS_01","Chim Két Đá · mỏ, mắt, mí, cánh","3:2",parts("of the Stone Parrot: (1) upper beak, (2) lower beak, (3) eye closed (a thin crack), (4) eye half open, (5) eye fully open with a small white gap pupil, (6) three separate wing panels made of stone ribs, (7) a row of five stone feathers.")]
+ ]},
+ {key:"v4", title:"Vùng 4 · Lòng núi", meta:"14:00–19:00 · Đêm sâu · Rắn Thần", items:[
+  ["XS_V04_BG_SHAFT_01","Giếng đá dọc, cột đá","2:3",bg("shaft","a deep vertical stone shaft inside the mountain, natural granite columns, ancient carved niches, an underground stream falling as thin black streaks down one wall.")],
+  ["XS_V04_BG_MID_01","Vòm đá, hồ ngầm, thạch nhũ","3:2",bg("mid","an underground cave hall with gothic-like natural stone arches, stalactites hanging from the top edge, stalagmites rising from the ground, the flat edge of an underground lake.")],
+  ["XS_V04_FG_01","Rễ, đá ướt, nhũ đá","3:2",bg("fg","dripping stalactites along the top edge, wet round boulders along the bottom, roots breaking through the rock at the left edge.")],
+  ["XS_V04_PROP_VINES_01","Dây leo treo 3 độ dài","2:3",prop("three separate hanging vine ropes of short, medium and long length, thick twisted vines with small leaves, each hanging straight down from a small rock anchor at the top.")],
+  ["XS_V04_PROP_SET_01","Cần gạt, bè, bệ trượt, chông đá","1:1",prop("separate cave mechanism pieces: a stone lever, a small wooden raft, a sliding stone slab platform, and a row of sharp stone spikes.")],
+  ["XS_V04_CREATURE_FULL_01","Rắn Thần · toàn thân tham khảo","2:3",full("the Serpent Deity, an endless serpent coiled around a vertical stone column inside a deep shaft; its scales form ornate gothic lattice window patterns (shown as small white gaps), a crest of thin thorns along its back, its head far above, wise and calm.")],
+  ["XS_V04_CREATURE_PARTS_01","Rắn Thần · 8 đoạn thân","3:2",parts("of the Serpent Deity body for a chain rig: (1) four straight body segments, (2) two curved body segments, (3) tail tip, (4) head in profile with closed mouth, (5) head with mouth slightly open. Lattice scale pattern as small white gaps inside the black shapes.")]
+ ]},
+ {key:"v5", title:"Vùng 5 · Rừng Núi Cấm", meta:"19:00–25:00 · Trước bình minh · Ông Ba Mươi", items:[
+  ["XS_V05_BG_FAR_01","Rừng cổ thụ xa, núi","3:2",bg("far","a distant ancient forest on the slope of Núi Cấm (Forbidden Mountain), giant tree canopies like domes, a mountain summit behind.")],
+  ["XS_V05_BG_MID_01","Cổ thụ, vách sạt","3:2",bg("mid","colossal ancient trees with buttress roots and twisted trunks, hanging moss and lianas, a section of cracked collapsing hillside with loose boulders.")],
+  ["XS_V05_FG_01","Dây leo, bụi, rễ","3:2",bg("fg","dense lianas and creepers hanging from the top edge, thorny bushes and huge roots along the bottom.")],
+  ["XS_V05_PROP_BRIDGE_01","Cầu gãy và thân gỗ đẩy","3:2",prop("an old rope-and-plank forest bridge broken in the middle: draw the left half and the right half as separate pieces with a gap, plus a separate straight log that could fill the gap.")],
+  ["XS_V05_PROP_SET_01","Dây đu, bệ đá sụp, cây đổ, đá rơi","1:1",prop("separate pieces: one long swinging liana, a stone ledge platform in three states (intact, cracked, broken into falling pieces), a falling tree trunk with branches, and three falling rocks.")],
+  ["XS_V05_CREATURE_FULL_01","Ông Ba Mươi · toàn thân tham khảo","3:2",full("Ông Ba Mươi, a towering gaunt tiger spirit made of mist: elongated thin limbs, long neck, a thorny mane, stripes shaped like lace and filigree (drawn as white gaps cut through the black body), the rear of its body dissolving into wisps. Draw it solid black; the game will render it as pale mist.")],
+  ["XS_V05_CREATURE_PARTS_01","Ông Ba Mươi · bộ phận ráp xương","3:2",parts("of the mist tiger: (1) head in profile, mouth closed, (2) head with mouth open, (3) neck, (4) torso with lace stripes as white gaps, (5) front leg, (6) hind leg, (7) long tail, (8) three loose mist wisps of different sizes.")],
+  ["XS_V05_CREATURE_EYE_01","Ông Ba Mươi · đầu cúi chào (cảnh kết vùng)","1:1",`The head and front body of the mist tiger, lowering its head slowly as a gesture of farewell, eyes half closed, rear body dissolving into wisps. Draw solid black with lace stripes as white gaps.${TAIL}`]
+ ]},
+ {key:"v6", title:"Vùng 6 · Đỉnh núi", meta:"25:00–30:00 · Bình minh · Năm vị canh giữ", items:[
+  ["XS_V06_BG_FAR_01","Bảy lớp núi, biển mây","3:2",bg("far","the seven mountains of Thất Sơn seen from a summit, ridges layered one behind another, a calm sea of clouds filling the valleys between them.")],
+  ["XS_V06_BG_MID_01","Triền núi, cây nhỏ, mỏm đá","3:2",bg("mid","an open mountain path rising to the right, a small lone wind-shaped tree, a flat rock outcrop at the end of the path overlooking the void.")],
+  ["XS_V06_FG_01","Cỏ núi, đá, lá bay","3:2",bg("fg","tall mountain grass bending in the wind along the bottom, a few round stones, a flowering branch at the right edge with leaves drifting away.")],
+  ["XS_V06_GUARDIANS_01","Năm vị canh giữ ở xa","3:2",`Five separate distant silhouettes in a row with gaps, each calm and resting, as if part of the landscape: (1) the Palm Walker standing like a group of palms, (2) the Crocodile Sovereign's spine arches above clouds, (3) the Stone Parrot perched with folded stone wings, (4) the Serpent Deity coiled around a peak, (5) the mist tiger sitting upright. Simple shapes, low detail, readable at small size.${TAIL}`],
+  ["XS_V06_PROP_SET_01","Nón lá đặt xuống, lá bay","1:1",prop("a Vietnamese conical hat (nón lá) lying on the ground in side view, plus five separate small drifting leaves in different rotations.")]
+ ]},
+ {key:"char", title:"Nhân vật", meta:"Cậu bé và em gái · dùng để ráp xương bằng code", items:[
+  ["XS_CHR_HAT_01","Nón lá rời (bay, rơi, nằm, nổi, bẹp)","3:2",prop("the boy's Vietnamese conical hat (nón lá) as separate pieces in rows with gaps, all the same scale and matching the hat he wears: (1) side view upright as worn, with its thin chin strap hanging, (2) to (5) tumbling through the air at four different rotations, strap flying, (6) landed on the ground resting on its brim, slightly tilted, (7) floating on water, only the cone above the waterline, (8) crushed and bent, torn at one edge, lying flat. Match the hat's size to a child's head.")],
+  ["XS_CHR_BOY_IDLE_01","Cậu bé · đứng thở (6 khung)","3:2",sheet(BOY,3,2,"standing idle loop: relaxed stance, chest rising and falling slowly, arms hanging loose, a tiny weight shift between feet, frame 4 lifts the hat brim slightly with one hand then lowers it.")],
+  ["XS_CHR_BOY_WALK_01","Cậu bé · đi (8 khung)","3:2",sheet(BOY,4,2,"a calm walk cycle, one full stride: contact, down, passing, up for each leg; arms swing opposite to the legs; the hat bobs slightly.")],
+  ["XS_CHR_BOY_RUN_01","Cậu bé · chạy (8 khung)","3:2",sheet(BOY,4,2,"a running cycle of a child, one full stride: body leaning forward, knees lifting high, arms pumping, one airborne frame per step, the chin strap fluttering.")],
+  ["XS_CHR_BOY_CARRY_01","Cậu bé · khiêng thùng gỗ đi (8 khung)","3:2",sheet(BOY,4,2,"walking slowly while carrying a heavy wooden crate in both arms against his chest, leaning back a little to balance the weight, short heavy steps, one full stride loop. The crate is part of the silhouette.")],
+  ["XS_CHR_BOY_PUTDOWN_01","Cậu bé · đặt thùng xuống (6 khung)","3:2",sheet(BOY,3,2,"putting the heavy wooden crate down: bending the knees, lowering the crate to the ground, letting go, straightening up, wiping his forehead with the back of his hand, standing.")],
+  ["XS_CHR_BOY_STARTLE_01","Cậu bé · nghe tiếng thét, ngoái lại (6 khung)","3:2",sheet(BOY,3,2,"hearing a scream behind him: body freezes, shoulders jump up, head snaps to look back over his shoulder, body twists toward the back, one foot steps back, ready to run. He starts facing right and ends turned toward the left.")],
+  ["XS_CHR_BOY_CALL_01","Cậu bé · gọi em (6 khung)","3:2",sheet(BOY,3,2,"calling out for his sister: hands cupped around his mouth, chest leaning forward, head lifting, shouting, then lowering his hands and looking around anxiously.")],
+  ["XS_CHR_BOY_KNEEL_01","Cậu bé · quỳ xuống bên hũ vỡ (6 khung)","3:2",sheet(BOY,3,2,"arriving and kneeling down: crouching, touching something small on the ground with one hand, picking it up and looking at it, then slowly lifting his head to look up and forward at something far away, standing up with determination.")],
+  ["XS_CHR_BOY_JUMP_01","Cậu bé · nhảy (8 khung)","3:2",sheet(BOY,4,2,"a full jump: (1) crouch to prepare, (2) push off, (3) rising with knees tucked and arms up, (4) apex, (5) starting to fall, (6) falling with arms out for balance, (7) landing in a deep crouch, (8) standing back up.")],
+  ["XS_CHR_BOY_PUSH_01","Cậu bé · đẩy vật nặng (8 khung)","3:2",sheet(BOY,4,2,"pushing a heavy object to the right with both hands and his shoulder, body leaning strongly forward, legs straining with short steps, one full step loop. Do not draw the object; his hands press against empty space at the right edge of the cell.")],
+  ["XS_CHR_BOY_PULL_01","Cậu bé · kéo vật nặng (8 khung)","3:2",sheet(BOY,4,2,"pulling a heavy object: he faces right gripping it with both hands at the right edge of the cell, leaning far back, stepping backward to the left with effort, one full step loop. Do not draw the object.")],
+  ["XS_CHR_BOY_CLIMB_01","Cậu bé · trèo lên gờ (8 khung)","3:2",sheet(BOY,4,2,"climbing up onto a ledge at the top-right of the cell: hanging by both hands with legs dangling, pulling up, elbows on the edge, swinging one knee up, crawling onto the top, standing up. Do not draw the ledge; keep the same hand height in frames 1 to 3.")],
+  ["XS_CHR_BOY_FEAR_01","Cậu bé · sợ hãi (6 khung)","3:2",sheet(BOY,3,2,"afraid, a loop: shoulders raised, body shrinking down, both hands gripping the hat brim and pulling it down, knees slightly bent, small trembling changes between frames, glancing upward once.")],
+  ["XS_CHR_BOY_EDGE_01","Cậu bé · chần chừ ở mép vực (6 khung)","3:2",sheet(BOY,3,2,"hesitating at the edge of a drop on his right: weight on the back foot, one arm stretched back for balance, the front foot testing the edge with the toes, head bowed looking down, then pulling back slightly. A loop.")],
+  ["XS_CHR_BOY_SIT_01","Cậu bé · ngồi ôm gối (8 khung)","3:2",sheet(BOY,4,2,"frames 1 to 4: sitting down on the ground slowly and drawing his knees up; frames 5 to 8: seated loop hugging his knees, head resting on them, breathing slowly, one small lift of the head to look around.")],
+  ["XS_CHR_BOY_LOOKUP_01","Cậu bé · ngước nhìn lên (6 khung)","3:2",sheet(BOY,3,2,"standing and slowly tilting his head far back to look up at something enormous above him, holding his hat on with one hand, taking one small step back in awe.")],
+  ["XS_CHR_BOY_DIE_CRUSH_01","Cậu bé · chết khi bị đè (6 khung)","3:2",sheet(BOY,3,2,"being hit from above: knees buckling, body collapsing forward to the ground, lying still on his side; the conical hat is NOT on his head in any frame (the game animates the hat flying off). Not gory.")],
+  ["XS_CHR_BOY_DIE_DROWN_01","Cậu bé · chết khi rơi xuống nước (6 khung)","3:2",sheet(BOY,3,2,"falling into deep water and sinking: falling feet first with arms up, sinking with arms reaching upward, slowly going under until only one hand is visible. Draw the water line as nothing; the game draws the water. Hat not on his head.")],
+  ["XS_CHR_SIS_FIREFLY_01","Em gái · bắt đom đóm (8 khung)","3:2",sheet(SIS,4,2,"catching fireflies, holding a small glass jar in one hand: looking up, tiptoeing, hopping up with her free hand cupped, landing, peeking into her cupped hand, putting it into the jar, admiring the jar, looking up again. Draw the jar as part of the silhouette. Fireflies are added by the game.")],
+  ["XS_CHR_SIS_RUN_01","Em gái · chạy theo đốm sáng (8 khung)","3:2",sheet(SIS,4,2,"running happily toward the right, one arm stretched forward reaching for something floating ahead of her, hair and dress bouncing, the glass jar swinging in her other hand, one full stride loop.")],
+  ["XS_CHR_SIS_IDLE_01","Em gái · đứng ngắm hũ (6 khung)","3:2",sheet(SIS,3,2,"standing and gazing at the glass jar held up in both hands, swaying gently side to side, a small happy bounce on her toes, a loop.")],
+  ["XS_CHR_SIS_END_01","Em gái · cảnh kết (8 khung)","3:2",sheet(SIS,4,2,"frames 1 to 3: sitting under a tree hugging her knees, breathing; frames 4 to 5: turning her head back as if hearing her brother; frames 6 to 8: standing up and reaching one hand out to hold his hand.")],
+  ["XS_CHR_SIBLINGS_01","Hai anh em ngồi trên mỏm đá (cảnh kết)","3:2",`The boy and his little sister sitting side by side on a rock outcrop, seen from the side, the boy's conical hat placed on the rock next to them, the sister leaning her head on his shoulder. Small figures, calm. Leave lots of empty white space above.${TAIL}`]
+ ]}
+];
+
+// Bối cảnh mở rộng: mỗi vùng có nền xa đổi dần, nền giữa riêng cho từng nhịp chơi, bộ cảnh rời để code tự dàn cảnh, một điểm nhấn và một đoạn chuyển vùng.
+const EXTRA = {
+ v1:[
+  ["XS_V01_BG_FAR_02","Nền xa 2 · núi gần hơn, rừng tràm hé ở chân trời","3:2",bg("far","the Seven Mountains now closer and larger, palm clusters thinning out, a low line of distant cajuput forest appearing on the right side.")],
+  ["XS_V01_BG_FAR_03","Nền xa 3 · bóng Người Thốt Nốt lẫn giữa cây","3:2",bg("far","a field of distant sugar palm clusters; one group is secretly the huge silhouette of the Palm Walker standing still, easily mistaken for trees, its crown of fan leaves taller than everything else.")],
+  ["XS_V01_BG_MID_02","Nền giữa · Nhịp 01 · bờ ruộng 3 rãnh nước","3:2",scene("01",`rice-field banks cut by three water ditches of increasing width, the last two deep and dark, a few young sugar palms, a tattered scarecrow, small tufts of rice stubble.`)],
+  ["XS_V01_BG_MID_03","Nền giữa · Nhịp 02 · ruộng lầy và vách đất cao","3:2",scene("02",`a muddy field ending at a tall earthen bank wall, a broken wooden fence along the top, deep cart wheel ruts in the mud, an abandoned plough.`)],
+  ["XS_V01_BG_MID_04","Nền giữa · Nhịp 03 · rặng thốt nốt trĩu quả","3:2",scene("03",`a dense grove of tall sugar palms heavy with fruit clusters, bamboo sap-collecting ladders tied to some trunks, a small thatched shelter in the middle of the grove.`)],
+  ["XS_V01_BG_MID_05","Nền giữa · Nhịp 04 · kênh vỡ bờ, hố chân khổng lồ","3:2",scene("04",`a wide canal with a broken bank, huge root-foot craters pressed into the field, normal palms leaning away as if pushed by a giant step.`)],
+  ["XS_V01_FG_02","Tiền cảnh 2 · thang tre lấy nốt, ống tre","3:2",bg("fg","bamboo sap ladders and hanging bamboo tubes for collecting palm sap at the left edge, tall wild grass and a broken palm frond at the right.")],
+  ["XS_V01_FG_03","Tiền cảnh 3 · bông lúa, lưới, cọc rào","3:2",bg("fg","heavy rice stalks bending along the bottom, a fishing net hung on poles at the left edge, a leaning fence post wrapped in vines at the right.")],
+  ["XS_V01_KIT_01","Bộ cảnh rời · cây thốt nốt","3:2",kit("sugar palm trees: young short palm, mature palm, very tall palm, leaning palm, twin-trunk palm, palm with broken top, dead palm with drooping dry fronds, palm with a bamboo ladder tied on, palm heavy with fruit clusters, a small clump of palm saplings.")],
+  ["XS_V01_KIT_02","Bộ cảnh rời · vật dụng đồng ruộng","3:2",kit("rural field objects: small thatched hut on stilts, scarecrow, wooden fence segment, haystack, bundle of rice sheaves, bamboo plank bridge, old water jar, resting water buffalo, wooden ox yoke, pile of palm fronds.")],
+  ["XS_V01_LANDMARK_01","Điểm nhấn · cây thốt nốt cổ thụ cô độc","3:2",landmark("a single colossal ancient sugar palm alone in a vast flat field at dusk, far taller than any other tree; at its base a tiny girl runs toward a small floating light, drawn as a small white circle.")],
+  ["XS_V01_FX_CLOUDS_01","Hiệu ứng · mây và dải sương (dùng chung cả game)","3:2",prop("a sheet of separate soft cloud and mist shapes drawn as flat black silhouettes with ragged, wispy edges: three long horizontal fog bands, four puffy cloud clusters of different sizes, two thin streaks of drifting mist. The game will tint them pale and make them semi-transparent.")],
+  ["XS_V01_TRANS_01","Chuyển vùng · đồng thốt nốt sang rừng tràm","3:2",trans("open rice fields with sugar palms and a canal.","flooded cajuput forest with thin white-barked trunks standing in water; the canal flows from left to right into the swamp.")]
+ ],
+ v2:[
+  ["XS_V02_BG_FAR_02","Nền xa 2 · tràm dày, khe trống cho sương","3:2",bg("far","a denser, taller cajuput forest with several horizontal empty white bands between tree layers, where fog will drift.")],
+  ["XS_V02_BG_FAR_03","Nền xa 3 · sân chim","3:2",bg("far","a bird sanctuary in the cajuput forest: treetops full of nesting storks and cormorants, some birds taking off.")],
+  ["XS_V02_BG_MID_02","Nền giữa · Nhịp 05 · khoảng nước rộng, cụm rễ","3:2",scene("05",`a wide open water channel between two banks, a few clumps of roots sticking out of the water in the middle, small floating islands of water hyacinth.`)],
+  ["XS_V02_BG_MID_03","Nền giữa · Nhịp 06 · bờ đê và cống cũ","3:2",scene("06",`an old earthen dike with a wooden sluice culvert, a low wooden beam spanning the water, overgrown with vines, water level marks on the posts.`)],
+  ["XS_V02_BG_MID_04","Nền giữa · Nhịp 07 · bãi nước nông, gò đất để nấp","3:2",scene("07",`a shallow open area with sparse cajuput trunks spaced far apart, low earth mounds and fallen trunks a child could hide behind, sharp broken roots sticking up.`)],
+  ["XS_V02_BG_MID_05","Nền giữa · Nhịp 08 · kênh sâu, bờ cao","3:2",scene("08",`a deep wide still canal, a high steep bank on the far right side, large trees overhanging the water from both sides.`)],
+  ["XS_V02_FG_02","Tiền cảnh 2 · lá sen, lau sậy","3:2",bg("fg","large lotus leaves and lotus flowers on tall stems along the bottom, a dense clump of reeds at the left edge.")],
+  ["XS_V02_FG_03","Tiền cảnh 3 · mái chèo, lờ cá, rễ rối","3:2",bg("fg","an old boat oar stuck in the mud, woven fish traps hanging from a branch at the right edge, tangled roots at the left.")],
+  ["XS_V02_KIT_01","Bộ cảnh rời · cây tràm","3:2",kit("cajuput trees: thin straight trunk, leaning trunk, forked trunk, dead pale trunk with peeling bark, trunk with a stork nest, clump of young saplings, tree with exposed arching roots, short broken stump, tree with hanging moss, wide old tree.")],
+  ["XS_V02_KIT_02","Bộ cảnh rời · nước và đồ đánh bắt","3:2",kit("swamp elements: water hyacinth clump, lotus group, reed clump, root cluster, floating branch, woven fish trap (lờ), conical fish trap (đó), bamboo marker pole, small abandoned wooden sampan, heron standing on one leg.")],
+  ["XS_V02_LANDMARK_01","Điểm nhấn · chòi canh giữa rừng tràm","3:2",landmark("a tall bamboo-and-wood watchtower rising above the cajuput canopy at dusk, a long narrow wooden walkway winding through the flooded forest toward it.")],
+  ["XS_V02_TRANS_01","Chuyển vùng · rừng tràm sang suối đá","3:2",trans("flooded cajuput swamp with duckweed.","a rocky stream with large granite boulders and the first steep slope of Núi Két; the water flows down between rocks.")]
+ ],
+ v3:[
+  ["XS_V03_BG_FAR_02","Nền xa 2 · núi đêm, khoảng trắng cho trăng","3:2",bg("far","mountain ridges at night seen closer, with a large empty round white area left in the upper part for the moon.")],
+  ["XS_V03_BG_FAR_03","Nền xa 3 · thung lũng nhìn từ trên cao","3:2",bg("far","the valley seen from high above: tiny fields, the swamp forest as a low dark band, a winding river.")],
+  ["XS_V03_BG_MID_02","Nền giữa · Nhịp 09 · vách đá ba gờ","3:2",scene("09",`a tall cliff wall with three rock ledges stepping upward, roots hanging over the edges, a deep crevice opening at the far right end.`)],
+  ["XS_V03_BG_MID_03","Nền giữa · Nhịp 10 · nền cối đá cổ","3:2",scene("10",`an abandoned ancient stone mill platform on the mountainside, broken low stone walls, a round hollow carved into the rock, a wooden frame for a pulley.`)],
+  ["XS_V03_BG_MID_04","Nền giữa · Nhịp 11 · vách nứt, đá chực rơi","3:2",scene("11",`a cracked vertical rock face with loose boulders wedged above, two small cave hollows in the wall where a child could shelter.`)],
+  ["XS_V03_BG_MID_05","Nền giữa · Nhịp 12 · mép vực, cơ cấu cổ","3:2",scene("12",`a ledge at the edge of an abyss, an ancient bronze and stone mechanism half buried in the rock, huge wing-shaped rock slabs above.`)],
+  ["XS_V03_FG_02","Tiền cảnh 2 · dây leo phủ đá, cây bonsai núi","3:2",bg("fg","hanging vines draped over a rock at the left edge, a twisted wind-bent mountain shrub at the right edge, scattered stones at the bottom.")],
+  ["XS_V03_FG_03","Tiền cảnh 3 · mảnh đá chạm, cột gãy, dương xỉ","3:2",bg("fg","carved stone fragments and a broken gothic pillar lying at the bottom, large fern fronds at both edges.")],
+  ["XS_V03_KIT_01","Bộ cảnh rời · cây núi","3:2",kit("mountain vegetation: twisted tree growing out of a rock crack, wind-bent shrub, fig tree with roots wrapping a boulder, dead tree with sharp branches, fern clump, wild orchid on a branch, bamboo clump, small bent pine-like tree, thorny bush, tall grass tuft.")],
+  ["XS_V03_KIT_02","Bộ cảnh rời · đá và phế tích","3:2",kit("rocks and ruins: round granite boulder, tall flat boulder, stacked balancing stones, segment of ancient stone steps, broken gothic stone arch, carved pillar, old stone lantern, cave entrance mouth, rock spire, cracked slab.")],
+  ["XS_V03_LANDMARK_01","Điểm nhấn · mỏm đá hình đầu két","3:2",landmark("a huge granite outcrop shaped exactly like a parrot head jutting out from the mountain at night, seen from below; a tiny boy stands on a ledge far beneath it.")],
+  ["XS_V03_TRANS_01","Chuyển vùng · sườn núi vào lòng núi","3:2",trans("an open mountain slope with boulders and shrubs.","a narrow crack in the rock leading into the dark mountain interior; the rock mass grows heavier and the open white space shrinks.")]
+ ],
+ v4:[
+  ["XS_V04_BG_SHAFT_02","Nền dọc 2 · khe hẹp, đá kẹt, rễ","2:3",bg("shaft","a narrow vertical crack with boulders wedged between the walls, roots growing down from above, a small opening of light far at the top.")],
+  ["XS_V04_BG_SHAFT_03","Nền dọc 3 · miệng giếng mở ra trời đêm","2:3",bg("shaft","the top of the shaft opening to the night sky, tree roots and fallen trunks hanging into it, the forest edge visible at the rim.")],
+  ["XS_V04_BG_MID_02","Nền giữa · Nhịp 13 · miệng giếng rộng, dây treo","3:2",scene("13",`a wide well opening in the cave floor, very deep, a rock overhang above with a hanging vine anchor point, ledges on both sides.`)],
+  ["XS_V04_BG_MID_03","Nền giữa · Nhịp 15 · sông ngầm, trần thấp","3:2",scene("15",`an underground river channel under a low rock ceiling, flat rock ledges at different heights on the far wall.`)],
+  ["XS_V04_BG_MID_04","Nền giữa · Nhịp 16 · hang tròn quanh cột đá","3:2",scene("16",`a huge round cavern around a central stone column, ledges spiraling upward around the walls, roots hanging from the ceiling.`)],
+  ["XS_V04_BG_MID_05","Nền giữa · khám thờ cổ hoa văn rắn","3:2",scene("14–16",`ancient carved niches in the cave wall with serpent lattice ornaments, broken stone stairs leading up, an old stone basin catching dripping water.`)],
+  ["XS_V04_FG_02","Tiền cảnh 2 · rễ treo dày","3:2",bg("fg","a dense curtain of hanging roots along the top-left corner and the right edge, wet rocks at the bottom.")],
+  ["XS_V04_FG_03","Tiền cảnh 3 · măng đá, dơi treo","3:2",bg("fg","a cluster of stalagmites at the bottom-left, bats hanging upside down from a stalactite at the top-right.")],
+  ["XS_V04_KIT_01","Bộ cảnh rời · thạch nhũ, măng đá","3:2",kit("cave formations: long thin stalactite, cluster of short stalactites, thick stalagmite, stalagmite group, stone column joining floor and ceiling, flowstone curtain, cave mushroom cluster, hanging root bundle, rock shelf, dripping formation.")],
+  ["XS_V04_KIT_02","Bộ cảnh rời · phế tích dưới lòng đất","3:2",kit("underground ruins: carved wall niche, broken stone stair section, remains of a rope bridge, old wooden scaffolding, hanging chain, stone basin, fallen carved column, serpent-carved stone panel, old ladder, small stone altar without statues.")],
+  ["XS_V04_LANDMARK_01","Điểm nhấn · hồ ngầm dưới khe sáng","3:2",landmark("a vast underground lake inside the mountain, a single round opening in the ceiling far above, a huge natural rock formation shaped like a coiled serpent rising from the water.")],
+  ["XS_V04_TRANS_01","Chuyển vùng · lòng núi ra rừng Núi Cấm","3:2",trans("the cave mouth with stalactites and wet rock.","ancient forest of Núi Cấm with giant roots and tall trunks; the rock ceiling ends and open sky begins.")]
+ ],
+ v5:[
+  ["XS_V05_BG_FAR_02","Nền xa 2 · tán rừng hở thấy đỉnh núi","3:2",bg("far","a dense forest canopy with one gap through which the mountain summit is visible.")],
+  ["XS_V05_BG_FAR_03","Nền xa 3 · sườn núi sạt lở","3:2",bg("far","a mountainside with a fresh landslide scar, fallen trees and loose rocks sliding down.")],
+  ["XS_V05_BG_MID_02","Nền giữa · Nhịp 17 · ba khoảng trống trong rừng","3:2",scene("17",`three small forest clearings separated by thick clusters of trees and bushes a child could hide behind, open ground in each clearing.`)],
+  ["XS_V05_BG_MID_03","Nền giữa · Nhịp 18 · đường rừng, vòm rễ, cây nghiêng","3:2",scene("18",`a long forest path under huge arching roots, two large roots across the path to jump over, a leaning dead tree about to fall.`)],
+  ["XS_V05_BG_MID_04","Nền giữa · Nhịp 19 · khe núi, trụ cầu gãy","3:2",scene("19",`a deep ravine across the path, broken bridge posts on both sides, mist-filled emptiness below.`)],
+  ["XS_V05_BG_MID_05","Nền giữa · Nhịp 20 · đường vách sụp, vách cuối","3:2",scene("20",`a collapsing cliff path with separate rock platforms, a gap with a hanging liana, and a short final cliff wall leading upward at the right.`)],
+  ["XS_V05_FG_02","Tiền cảnh 2 · dương xỉ khổng lồ","3:2",bg("fg","giant tree ferns and large leaves at both edges, roots along the bottom.")],
+  ["XS_V05_FG_03","Tiền cảnh 3 · mạng nhện, dây gai","3:2",bg("fg","large spider webs stretched between branches at the top-right, thorny vines curling at the left edge.")],
+  ["XS_V05_KIT_01","Bộ cảnh rời · cổ thụ","3:2",kit("giant ancient trees: banyan with curtains of aerial roots, strangler fig, hollow trunk, buttress-root tree, fallen giant trunk, tree wrapped in lianas, dead tree with an owl, twisted double trunk, tall straight dipterocarp, tree split by lightning.")],
+  ["XS_V05_KIT_02","Bộ cảnh rời · nền rừng","3:2",kit("forest floor elements: root arch, mossy log, fern cluster, giant mushrooms, mossy boulder, bamboo grove clump, thorny bush, fallen branch pile, old stone marker, tangle of lianas on the ground.")],
+  ["XS_V05_LANDMARK_01","Điểm nhấn · cây cổ thụ rỗng như thánh đường","3:2",landmark("an immense hollow ancient tree whose roots and inner trunk form a gothic cathedral nave with pointed arches; the forest path runs straight through it.")],
+  ["XS_V05_TRANS_01","Chuyển vùng · rừng sang triền núi trống","3:2",trans("dense ancient forest with lianas.","an open grassy mountain slope under a wide sky; the trees thin out and become small and wind-bent.")]
+ ],
+ v6:[
+  ["XS_V06_BG_FAR_02","Nền xa 2 · đỉnh núi như đảo trên biển mây","3:2",bg("far","distant peaks rising like islands from a sea of clouds, the cloud tops drawn as soft rounded black shapes.")],
+  ["XS_V06_BG_FAR_03","Nền xa 3 · chân trời, chỗ cho mặt trời","3:2",bg("far","a very low, flat horizon line of mountains, with a large empty round white area left above the center for the rising sun.")],
+  ["XS_V06_BG_MID_02","Nền giữa · Nhịp 21 · triền thoải, hoa dại","3:2",scene("21",`a gentle mountain slope with old ledges and fallen logs that are now harmless, wildflowers and grass growing on them.`)],
+  ["XS_V06_BG_MID_03","Nền giữa · Nhịp 22 · sống núi ven biển mây","3:2",scene("22",`a ridge path along the edge of the clouds, wide open views on the left, a few low rocks and shrubs.`)],
+  ["XS_V06_BG_MID_04","Nền giữa · Nhịp 23 · cây nhỏ và phiến đá","3:2",scene("23",`a small lone tree with a flat stone under it where a child could sit, grass around, the ground rising slightly toward the outcrop.`)],
+  ["XS_V06_FG_02","Tiền cảnh 2 · hoa dại, bướm","3:2",bg("fg","wildflowers and tall grass along the bottom, a few butterflies at the right edge.")],
+  ["XS_V06_KIT_01","Bộ cảnh rời · cây cỏ đỉnh núi","3:2",kit("summit vegetation: lone wind-shaped tree, small flowering shrub, grass tuft, wildflower cluster, round rock, flat rock, dry branch, young sapling, bush with berries, stone cairn.")]
+ ]
+};
+const GROUPS = [
+ ["_MUSIC_","Nhạc","Tạo vài bản cho mỗi bài rồi chọn bản hay nhất. Tải về dạng MP3, đặt tên file đúng mã ID."],
+ ["_KEYART_","Ảnh chính","Đây là ảnh hoàn chỉnh dùng làm hình chia sẻ và tham khảo bố cục. Trong game, trang chào được dựng từ các lớp riêng bên dưới để có chuyển động."],
+ ["_UI_","Hoa văn và biểu tượng","Tên game, dòng LẤY CẢM HỨNG TỪ LIMBO và lời đề tặng do code viết bằng font, không nhờ AI vẽ chữ."],
+ ["_BG_FAR_","Nền xa","Đổi dần theo tiến trình, code chuyển mượt giữa các bản."],
+ ["_BG_SHAFT_","Nền dọc","Xếp chồng theo chiều dọc cho đoạn leo giếng."],
+ ["_BG_MID_","Nền giữa","Bản 01 dùng làm cảnh nối; các bản còn lại dựng riêng cho từng nhịp chơi."],
+ ["_LANDMARK_","Điểm nhấn","Cảnh chỉ xuất hiện một lần, camera chậm lại để người chơi ngắm."],
+ ["_TRANS_","Chuyển vùng","Nối liền vùng này sang vùng kế tiếp, không cắt cảnh."],
+ ["_FG_","Tiền cảnh","Code xen kẽ ngẫu nhiên để không lặp lại."],
+ ["_KIT_","Bộ cảnh rời","Code tự dàn cảnh từ các phần tử rời: đổi vị trí, tỉ lệ, lật ngang, nên mỗi đoạn đường đều khác nhau."],
+ ["_PROP_","Vật thể tương tác",""],
+ ["_CREATURE_|_FX_|_GUARDIANS_","Sinh vật và hiệu ứng",""],
+ ["_CHR_","Nhân vật",""]
+];
+const groupOf = id => GROUPS.findIndex(([k]) => k.split("|").some(p => id.includes(p)));
+REGIONS.forEach(r => {
+  if (!r.items) return;
+  if (EXTRA[r.key]) r.items.push(...EXTRA[r.key]);
+  r.items = r.items.map((it,i)=>[it,i]).sort((a,b)=> (groupOf(a[0][0]) - groupOf(b[0][0])) || (a[1]-b[1])).map(x=>x[0]);
+});
+
+const KEY = "baynui-assets-done";
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { done = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e) {} };
+const total = REGIONS.reduce((n,r)=>n+(r.items?r.items.length:0),0);
+const updateProgress = () => {
+  const n = Object.values(done).filter(Boolean).length;
+  document.getElementById("progress").textContent = `${n}/${total} asset đã có ảnh đạt`;
+};
+
+async function copy(text, btn){
+  const label = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = "Đã sao chép"; btn.classList.add("ok"); }
+  catch(e){
+    const pre = btn.closest(".card")?.querySelector("pre");
+    if (pre){ const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    btn.textContent = "Đã chọn chữ, nhấn Ctrl+C";
+  }
+  setTimeout(()=>{ btn.textContent = label; btn.classList.remove("ok"); }, 1600);
+}
+
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const nav = document.getElementById("nav"), main = document.getElementById("main");
+
+REGIONS.forEach(r => {
+  const a = el("a", null, r.title.replace(/^Vùng (\d) · /, "V$1 · "));
+  a.href = "#" + r.key;
+  if (r.items){ const n = el("span","n", r.items.length); a.appendChild(n); }
+  nav.appendChild(a);
+
+  const sec = el("section"); sec.id = r.key;
+  sec.appendChild(el("h2", null, r.title));
+  sec.appendChild(el("p", "meta", r.meta));
+
+  if (r.style){
+    const card = el("div","card master");
+    const head = el("div","head");
+    head.appendChild(el("span","name","Dán vào tin nhắn đầu tiên của mỗi cuộc chat"));
+    card.appendChild(head);
+    const ol = el("ol","steps");
+    [
+      "Mỗi vùng mở một cuộc chat ChatGPT mới, dán khối này, đợi trả lời OK.",
+      "Mỗi tin nhắn chỉ dán một prompt. Chọn đúng tỉ lệ ghi trên thẻ (3:2 ngang, 2:3 dọc, 1:1 vuông).",
+      "Nếu ảnh có màu xám, gradient hay nền không trắng, trả lời: \"Redo: pure black and pure white only, no grey.\"",
+      "Bảng khung hình nhân vật (có chữ CHROMA GREEN) phải ra nền xanh lá thuần. Nếu ChatGPT kẻ lưới, đánh số hoặc nhân vật chạm mép ô, trả lời: \"Redo: no grid lines, no numbers, keep every pose inside its cell.\"",
+      "Tải ảnh về, đặt tên file đúng mã ID (ví dụ XS_CHR_BOY_WALK_01.png), gửi lại cho Claude theo từng vùng."
+    ].forEach(t => ol.appendChild(el("li", null, t)));
+    card.appendChild(ol);
+    const pre = el("pre", null, STYLE); card.appendChild(pre);
+    const act = el("div","actions"); const b = el("button", null, "Sao chép khối phong cách");
+    b.type = "button"; b.onclick = () => copy(STYLE, b); act.appendChild(b); card.appendChild(act);
+    sec.appendChild(card);
+    main.appendChild(sec); return;
+  }
+
+  const bar = el("div","actions"); bar.style.margin = "0 0 12px";
+  const all = el("button", null, "Sao chép cả vùng (kèm khối phong cách)"); all.type = "button";
+  const allText = STYLE + "\n\n---\nAfter replying OK, generate these in order, one per message when I say NEXT:\n\n" + r.items.map(i => `[${i[0]}] (${i[2]})\n${i[3]}`).join("\n\n");
+  all.onclick = () => copy(allText, all);
+  bar.appendChild(all); sec.appendChild(bar);
+
+  let list, lastG = -2;
+  r.items.forEach(([id,name,ratio,text]) => {
+    const g = groupOf(id);
+    if (g !== lastG){
+      lastG = g;
+      const gh = el("h3","group", g >= 0 ? GROUPS[g][1] : "Khác");
+      const cnt = r.items.filter(i => groupOf(i[0]) === g).length;
+      gh.appendChild(el("span","n", cnt));
+      sec.appendChild(gh);
+      if (g >= 0 && GROUPS[g][2]) sec.appendChild(el("p","gnote",GROUPS[g][2]));
+      list = el("div","list"); sec.appendChild(list);
+    }
+    const full = id.includes("_MUSIC_") ? text : `[${id}] Aspect ratio ${ratio}.\n${text}`;
+    const card = el("div","card" + (done[id] ? " done" : ""));
+    const head = el("div","head");
+    head.appendChild(el("span","id",id));
+    head.appendChild(el("span","name",name));
+    head.appendChild(el("span","ratio",ratio));
+    card.appendChild(head);
+    card.appendChild(el("pre", null, full));
+    const act = el("div","actions");
+    const b = el("button", null, "Sao chép prompt"); b.type = "button"; b.onclick = () => copy(full, b);
+    act.appendChild(b);
+    const lab = el("label","chk"); const cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "chk-" + id; cb.checked = !!done[id];
+    cb.onchange = () => { done[id] = cb.checked; card.classList.toggle("done", cb.checked); save(); updateProgress(); };
+    lab.appendChild(cb); lab.appendChild(document.createTextNode("Đã có ảnh"));
+    act.appendChild(lab);
+    card.appendChild(act);
+    list.appendChild(card);
+  });
+  main.appendChild(sec);
+});
+updateProgress();
+
+// Dải núi bảy lớp vẽ bằng canvas, màu theo token
+function drawRidge(){
+  const c = document.getElementById("ridge"), dpr = devicePixelRatio || 1;
+  const w = c.clientWidth, h = c.clientHeight; c.width = w*dpr; c.height = h*dpr;
+  const g = c.getContext("2d"); g.scale(dpr,dpr); g.clearRect(0,0,w,h);
+  const cs = getComputedStyle(document.documentElement);
+  const ink = cs.getPropertyValue("--ink").trim(), paper = cs.getPropertyValue("--paper").trim();
+  const peaks = [[.08,.55],[.22,.35],[.37,.6],[.5,.2],[.63,.5],[.78,.3],[.92,.58]];
+  for (let L=0; L<4; L++){
+    g.globalAlpha = [.12,.22,.45,1][L];
+    g.fillStyle = ink; g.beginPath(); g.moveTo(0,h);
+    const base = h*(.55 + L*.12), amp = h*(.5 - L*.1);
+    for (let x=0; x<=w; x+=4){
+      let y = base;
+      peaks.forEach(([px,ph],i)=>{ const d=(x/w - px - L*.03*(i%2?1:-1))*7; y -= amp*(1-ph)*Math.exp(-d*d); });
+      y += Math.sin(x*.05+L)*1.5;
+      g.lineTo(x, Math.min(h,y));
+    }
+    g.lineTo(w,h); g.closePath(); g.fill();
+  }
+  g.globalAlpha = 1; g.fillStyle = cs.getPropertyValue("--lamp").trim();
+  g.beginPath(); g.arc(w*.5, h*.18, 3, 0, Math.PI*2); g.fill();
+}
+drawRidge();
+addEventListener("resize", drawRidge);
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", drawRidge);
+new MutationObserver(drawRidge).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
