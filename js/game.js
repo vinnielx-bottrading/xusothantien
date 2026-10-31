@@ -16,7 +16,7 @@ function loadAll(){
   let n=0;
   return Promise.all(NAMES.map(k=>new Promise(res=>{const im=new Image();
     im.onload=()=>{IMG[k]=im;n++;loadmsg.textContent=`Đang tải ${n}/${NAMES.length}`;res();};
-    im.onerror=()=>{n++;res();}; im.src="a/"+k+".webp";})));
+    im.onerror=()=>{n++;res();}; im.src="a/"+k+".webp?v="+(window.BUILD||"");})));
 }
 function tinted(img,color){const c=document.createElement("canvas");c.width=img.width;c.height=img.height;const x=c.getContext("2d");x.drawImage(img,0,0);x.globalCompositeOperation="source-in";x.fillStyle=color;x.fillRect(0,0,c.width,c.height);return c;}
 
@@ -72,10 +72,10 @@ function sfx(type,vol=1){
     o.start(t);vib.start(t);o.stop(t+1.25);vib.stop(t+1.25);}
   else if(type==="cricket"){for(let i=0;i<3;i++){const o=AC.createOscillator();o.frequency.value=4300+Math.random()*300;const gg=AC.createGain();o.connect(gg);gg.connect(cricketG);const tt=t+i*0.06;gg.gain.setValueAtTime(0,tt);gg.gain.linearRampToValueAtTime(0.05,tt+0.01);gg.gain.linearRampToValueAtTime(0,tt+0.04);o.start(tt);o.stop(tt+0.05);}}
 }
-const screamA=new Audio("a/sfx/XS_SFX_SCREAM_01.mp3"); screamA.preload="auto"; screamA.addEventListener("error",()=>{screamA.dead=true;});
+const screamA=new Audio("a/sfx/XS_SFX_SCREAM_01.mp3?v="+(window.BUILD||"")); screamA.preload="auto"; screamA.addEventListener("error",()=>{screamA.dead=true;});
 let hushT=0;
 function playScream(){
-  if(!screamA.dead){ screamA.volume=0.8; screamA.currentTime=0; screamA.play().catch(()=>hush()); }
+  if(!screamA.dead){ screamA.volume=0.8; screamA.currentTime=0; hushT=3.2; screamA.play().catch(()=>hush()); }
   else hush();
 }
 function hush(){ // no recording: crickets stop dead, birds burst out of the grass, a soft thud far away
@@ -108,7 +108,7 @@ const solids=[ {x0:-2400,x1:700,y0:0}, {x0:700,x1:765,y0:26,shallow:true}, {x0:7
   {x0:1325,x1:1850,y0:0}, {x0:1850,x1:2350,y0:-125}, {x0:2350,x1:2480,y0:0}, {x0:3120,x1:5960,y0:0}, {x0:6900,x1:9800,y0:0} ];
 const pits=[{x0:950,x1:1045,w:16},{x0:1200,x1:1325,w:16},{x0:2480,x1:3120,w:16,post:2800},{x0:5960,x1:6900,w:16,marsh:true}];
 const shallow={x0:700,x1:765,w:14};
-const CPS=[{x:-800},{x:-240},{x:1080},{x:1960},{x:2400},{x:3170},{x:3990},{x:4740},{x:5800},{x:6960},{x:3990+EO}];
+const CPS=[{x:-1000},{x:-240},{x:1080},{x:1960},{x:2400},{x:3170},{x:3990},{x:4740},{x:5800},{x:6960},{x:3990+EO}];
 const ENC_CP=10;
 const HUT={x0:4560,x1:4700,roof:-74};
 const TREES=[4120,4290,4460];
@@ -190,13 +190,13 @@ function shimmerLayer(src,t,col,amt=0.22){ if(!shimmer)shimmer=document.createEl
 const motes=[];
 
 // ---------- player ----------
-const pl={x:-800,y:0,vx:0,vy:0,face:-1,ground:true,coyote:0,idle:0,dead:false,deadT:0,deadKind:"",push:null,pull:false,fear:0,hes:0,lookUp:0,sit:0,
+const pl={x:-1000,y:0,vx:0,vy:0,face:-1,ground:true,coyote:0,idle:0,dead:false,deadT:0,deadKind:"",push:null,pull:false,fear:0,hes:0,lookUp:0,sit:0,
   anim:"idle",at:0,lock:null,lockT:0,carry:false,landT:0,stepSnd:0};
 let hat=null;
 const SPEED=180,G=1000,JV=457;
 function rectHit(ax0,ay0,ax1,ay1,bx0,by0,bx1,by1){return ax0<bx1&&ax1>bx0&&ay0<by1&&ay1>by0;}
 function allBoxes(){ const b=[{x0:cart.x,x1:cart.x+cart.w,y0:cart.y-cart.h,y1:cart.y,ref:cart},{x0:log.x,x1:log.x+log.w,y0:log.y-log.h,y1:log.y,ref:log}];
-  if(intro.crate) b.push({x0:intro.crate.x-12,x1:intro.crate.x+12,y0:-(window.CRATE?CRATE.h:20),y1:0,ref:"crate"}); return b.concat(footRects(), typeof legRects==="function"?legRects().concat(mstepRects()):[]); }
+  return b.concat(footRects(), typeof legRects==="function"?legRects().concat(mstepRects()):[]); }
 function solidRects(){return solids.map(s=>({x0:s.x0,x1:s.x1,y0:s.y0,y1:3000})).concat(typeof padRects==="function"?padRects():[]);}
 function movePushable(o,dx){const nx=o.x+dx;for(const r of solidRects()){if(rectHit(nx,o.y-o.h+1,nx+o.w,o.y-1,r.x0,r.y0,r.x1,r.y1))return 0;} if(o===cart&&nx+o.w>1850)return Math.max(0,1850-o.w-o.x); o.x=nx;return dx;}
 
@@ -246,7 +246,7 @@ function updateFruit(dt){
 function updateIntro(dt){
   intro.t+=dt; intro.sisT+=dt;
   const I=intro;
-  if(I.phase==="cam_sis"){ if(I.t>4.2){I.phase="carry";I.t=0;} }
+  if(I.phase==="cam_sis"){ if(I.t>7){I.phase="carry";I.t=0;} }
   if(I.phase==="carry"){ // sister wanders to the grass while the camera is away
     if(I.t>3&&I.sisMode==="firefly"){I.sisMode="run";}
     if(I.sisMode==="run"){ I.sisX+=58*dt; if(I.sisX>GRASS_X+30){I.sisMode="gone";} }
@@ -582,7 +582,7 @@ function prepare(){
   makeFx(); palmTint=tinted(IMG.palm_8,"#111419");
   pwBuf=document.createElement("canvas"); pwBuf.width=380; pwBuf.height=900;
   cpIndex=0; resetLevel(0);
-  Object.assign(pl,{x:-800,y:0,face:-1,carry:true});
+  Object.assign(pl,{x:-1000,y:0,face:-1,carry:true});
 }
 const startBtn=document.getElementById("start");
 loadAll().then(()=>{ prepare(); loadmsg.hidden=true; startBtn.hidden=false; startBtn.focus(); requestAnimationFrame(frame); });
@@ -601,7 +601,7 @@ $("resume").addEventListener("click",()=>closeUI("pause"));
 $("retryCP").addEventListener("click",()=>{ closeUI("pause"); if(intro.phase!=="journey"&&cpIndex===0){ restartAll(); } else respawn(); });
 $("retryAll").addEventListener("click",()=>{ closeUI("pause"); restartAll(); });
 $("lostRetry").addEventListener("click",()=>closeUI("lost"));
-function restartAll(){ cpIndex=0; deaths=0; resetLevel(0); Object.assign(pl,{x:-800,y:0,vx:0,vy:0,face:-1,carry:true,dead:false,lock:null,anim:"idle",at:0}); hat=null; introReset(); cam.x=-430; fade=1; musicWant="rest"; }
+function restartAll(){ cpIndex=0; deaths=0; resetLevel(0); Object.assign(pl,{x:-1000,y:0,vx:0,vy:0,face:-1,carry:true,dead:false,lock:null,anim:"idle",at:0}); hat=null; introReset(); cam.x=-430; fade=1; musicWant="rest"; }
 $("again").addEventListener("click",()=>{ $("end").classList.add("hide"); ended=false; paused=false; restartAll(); });
 document.querySelectorAll(".b-donate").forEach(b=>b.addEventListener("click",()=>openUI("donate")));
 $("dn-close").addEventListener("click",()=>closeUI("donate"));
