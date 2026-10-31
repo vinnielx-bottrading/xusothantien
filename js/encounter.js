@@ -3,11 +3,11 @@
 // Phases: appear → steps → peer → swipe → wander → vanish. Dying in "steps" or "swipe" resumes that phase.
 const ENC_PH=["appear","steps","peer","swipe","wander","vanish"];
 const ENC_DUR={appear:7,steps:14.5,peer:10,swipe:12,wander:11,vanish:7.5};
-const ARENA={x0:3995,x1:4300};
+const ARENA={x0:3995+EO,x1:4300+EO};
 const WARN=1.5, SLAM=0.3, PLANT=1.8, LIFT=0.9;
 let D=null, encSave=0;
 function newDirector(){
-  const resume=(cpIndex===7&&encSave>0);
+  const resume=(cpIndex===ENC_CP&&encSave>0);
   return {active:resume,ph:resume?encSave:0,t:0,steps:[],swipes:[],head:{x:0,y:-900,on:false},big:null,fg:null,done:false,musicOn:false,stepIdx:0,swipeIdx:0,lastPh:{}};
 }
 function stepState(st){ const t=D.t-st.t0; if(t<0)return{y:-900,ph:"wait",k:0};
@@ -25,12 +25,12 @@ function encLookUp(){ if(!D||!D.active||D.done)return false; const p=phName(); i
 
 function updateDirector(dt){
   if(!D)return;
-  if(!D.active){ if(pl.x>3780&&!pl.dead){ D.active=true; D.ph=0; D.t=0; } else return; }
+  if(!D.active){ if(pl.x>3780+EO&&!pl.dead){ D.active=true; D.ph=0; D.t=0; } else return; }
   if(D.done){ return; }
   D.t+=dt; const p=phName();
   D.musicOn = !(p==="vanish"&&D.t>3);
   // ---- appear: it condenses out of the fog ahead, flickering in many images
-  if(p==="appear"){ if(D.ax==null)D.ax=Math.max(4250,pl.x+330); D.big={x:D.ax+Math.sin(D.t*0.3)*20,h:1050,alpha:clamp(D.t/3,0,1),ghosts:3,step:0,layer:"behind"};
+  if(p==="appear"){ if(D.ax==null)D.ax=Math.max(4250+EO,pl.x+330); D.big={x:D.ax+Math.sin(D.t*0.3)*20,h:1050,alpha:clamp(D.t/3,0,1),ghosts:3,step:0,layer:"behind"};
     if(D.t<0.1)sfx("rumble",0.6); if(Math.random()<dt*2)sfx("rustle",0.3); }
   // ---- steps: four steps around the boy, the last one aimed right at him
   if(p==="steps"){ D.big=null;

@@ -1,0 +1,2 @@
+Đặt tiếng thét của em gái vào đây với tên XS_SFX_SCREAM_01.mp3 (prompt trong source_assets/prompts/prompt_asset.html).
+Chưa có file thì game dùng hiệu ứng im lặng: dế tắt, chim vụt bay.

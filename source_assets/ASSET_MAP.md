@@ -76,6 +76,35 @@
 | KEYART_02 | `Contemplative Child Beneath the Palm Giant.png` |
 | SIBLINGS (cảnh kết) | `Two Children on a Quiet Cliff.png` |
 
+## art_vung2_tra_su/ (Vùng 2, chưa đưa vào game)
+- `Black-and-White Wetland to Waterfall Panorama.png`
+- `Cathedral Leviathan Beneath the Water.png`
+- `Crowned Swamp Beasts Among Water Plants.png`
+- `Gothic Archway Silhouette Asset Sheet.png`
+- `Lotus Pond Silhouette Border.png`
+- `Marsh Silhouette Asset Collection.png`
+- `Minimalist Bamboo Raft Silhouette.png`
+- `Minimalist Black-and-White Swamp Silhouette.png`
+- `Misty Swamp Forest Silhouette.png`
+- `Monochrome Cypress Swamp Panorama.png`
+- `Monochrome Jungle Wetland Frame.png`
+- `Monochrome Mangrove Marsh Silhouette.png`
+- `Monochrome Splash and Plant Silhouettes.png`
+- `Monochrome Swamp Birds in Flight.png`
+- `Monochrome Swamp Forest Silhouette.png`
+- `Monochrome Swamp Silhouette Panorama.png`
+- `Overgrown Swamp Bridge in Silhouette.png`
+- `Rustic Wooden Gate and Crane Silhouettes.png`
+- `Silhouette Marsh with Hanging Fish Traps.png`
+- `Swamp Tree Silhouette Collection.png`
+- `Swamp Watchtower and Skywalk.png`
+- `Three Stacked Woodland Log Silhouettes.png`
+
+## marketing/
+- `KV_nen_goc.png` ảnh nền KV gốc
+- `KV_XuSoThanTien.png`, `KV_XuSoThanTien_gon.png` KV đã ghép logo
+- `Logo_XuSoThanTien_den.png`, `Logo_XuSoThanTien_trang.png` logo nền trong suốt
+
 ## audio/
 
 | File | Dùng cho |
